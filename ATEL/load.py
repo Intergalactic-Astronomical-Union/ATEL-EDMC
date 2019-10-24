@@ -20,7 +20,7 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.08a'
+VERSION = '0.09a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 
 def plugin_start(plugin_dir):
@@ -99,18 +99,19 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
 # FSDJump happens often enough in the journal to use for debugging purposes.
     if entry['event'] == 'FSDJump':
         # We arrived at a new system!
-            sys.stderr.write("(Debug) System: {}\n".format(entry['StarSystem']))
-            status.set("(Debug) System: {} ({},{},{})\n".format(entry['StarSystem']))
+            sys.stderr.write("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
+            status.set("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
 
 ##############################
 #
 # What we're really after are unique discoveries.
     if entry['event'] == 'CodexDiscovery':
         # We discovered something!
+        # Lines 111, and 112 might not work the way I think they should. I don't know "tuple" well.
             sys.stderr.write("{} Discovered on {},{}\n".format(entry['Discovered'],['System'],['Body']))
             status.set("{} Discovered on {},{}\n".format(entry['Discovered'],['System'],['Body']))
             nb.Label(frame).grid()  # spacer
-            nb.Button(frame, text="Submit ATEL Discovery Bulletin", command=bulletin_callback).grid(row=10, column=0,
+            nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
 
 def plugin_stop():
