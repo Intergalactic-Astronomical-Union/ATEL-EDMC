@@ -20,7 +20,7 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.04a'
+VERSION = '0.05a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 
 def plugin_start(plugin_dir):
@@ -110,7 +110,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             sys.stderr.write("Discovery made on {}\n".format(entry['System'],.",".['Body'],.",".['Discovered']))
             status.set("Discovery made on {}\n".format(entry['System'],.",".['Body'],.",".['Discovered']))
                 nb.Label(frame).grid()  # spacer
-                nb.Button(frame, text="Submit ATEL Discovery Bulletin", command=upgrade_callback).grid(row=10, column=0,
+                nb.Button(frame, text="Submit ATEL Discovery Bulletin", command=bulletin_callback).grid(row=10, column=0,
                     columnspan=2, padx=PADX, sticky=tk.W)
                     
 def plugin_stop():
