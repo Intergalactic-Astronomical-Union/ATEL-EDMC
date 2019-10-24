@@ -20,7 +20,7 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.02a'
+VERSION = '0.03a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 
 def plugin_start(plugin_dir):
