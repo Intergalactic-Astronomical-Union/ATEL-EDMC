@@ -23,11 +23,31 @@ status = tk.StringVar()
 VERSION = '0.10a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 
+############
+#
+# mediawiki token request
+S = requests.Session()
+URL = "https://www.mediawiki.org/w/api.php"
+
+PARAMS = {
+    "action": "query",
+    "meta": "tokens",
+    "type": "login",
+    "format": "json"
+}
+
+R = S.get(url=URL, params=PARAMS)
+DATA = R.json()
+LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
+#sys.stderr.write(LOGIN_TOKEN+'\n')
+#
+##########
+
 def plugin_start(plugin_dir):
     """
     Load this plugin into EDMC
     """
-    sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8")))
+    sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))+'\n')
     #print "Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))
     return 'ATEL'
 
