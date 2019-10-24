@@ -77,6 +77,9 @@ def upgrade_callback():
                    'Please try again, and restart if problems persist']
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
+def bulletin_callback():
+    sys.stderr.write("Someone clicked the button!\n")
+
 def plugin_app(parent):
     """
     Create a pair of TK widgets for the EDMC main window
@@ -91,15 +94,25 @@ def plugin_app(parent):
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
+#############################
+#
+# FSDJump happens often enough in the journal to use for debugging purposes.
     if entry['event'] == 'FSDJump':
         # We arrived at a new system!
-        if 'StarPos' in entry:
-            sys.stderr.write("Arrived at {} ({},{},{})\n".format(entry['StarSystem'], *tuple(entry['StarPos'])))
-            status.set("Arrived at {} ({},{},{})\n".format(entry['StarSystem'], *tuple(entry['StarPos'])))
-        else:
-            sys.stderr.write("Arrived at {}\n".format(entry['StarSystem']))
-            status.set("Arrived at {} ({},{},{})\n".format(entry['StarSystem']))
+            sys.stderr.write("(Debug) System: {}\n".format(entry['StarSystem']))
+            status.set("(Debug) System: {} ({},{},{})\n".format(entry['StarSystem']))
 
+##############################
+#
+# What we're really after are unique discoveries.
+    if entry['event'] == 'CodexDiscovery':
+        # We discovered something!
+            sys.stderr.write("Discovery made on {}\n".format(entry['System'],.",".['Body'],.",".['Discovered']))
+            status.set("Discovery made on {}\n".format(entry['System'],.",".['Body'],.",".['Discovered']))
+                nb.Label(frame).grid()  # spacer
+                nb.Button(frame, text="Submit ATEL Discovery Bulletin", command=upgrade_callback).grid(row=10, column=0,
+                    columnspan=2, padx=PADX, sticky=tk.W)
+                    
 def plugin_stop():
     """
     EDMC is closing
