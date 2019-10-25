@@ -1,5 +1,34 @@
-# Based on example functions listed in EDMC Plugin Documentation:
-# https://github.com/Marginal/EDMarketConnector/blob/master/PLUGINS.md
+###############################################################################
+# A simple EDMC plugin to transmit CodexEntry data from the CMDR journal
+# to the Intergalactic Astronomical Union for record keeping, and scientific
+# purposes.
+#
+# Discoveries DO NOT have CMDR data attached to them unless a CMDR chooses to
+# submit a public Astronomical Telegram - a short "postcard" style anouncement
+# which can be used to immediately announce UNIQUE discoveries above and beyond
+# normal discoveries (geysers, lava spouts, terraformable HMC's, water worlds, etc.)
+#
+# ATEL notices are available at:
+# https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams
+#
+# DATA COLLECTION NOTICE:
+# IGAU only stores the following data:
+# discovery date/time, discovery name, and discovery location.
+#
+# code availble for review at:
+# https://github.com/Elite-IGAU/ATEL-EDMC
+#
+# please submit bug reports or issues at:
+# https://github.com/Elite-IGAU/ATEL-EDMC/issues
+#
+# Special thanks to:
+#
+# Mobius PVE (https://elitepve.com/) for their assistance
+# Otis B. EDMC (http://edcodex.info/?m=tools&entry=150)
+# The many wonderful explorers that make the Intergalactic Astronomical Union
+# a productive and enjoyable Elite Dangerous PVE squadron.
+#
+###############################################################################
 
 import sys
 import os
@@ -24,8 +53,6 @@ VERSION = '0.15a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 PADX = 10  # formatting
 
-############
-#
 # mediawiki token request
 S = requests.Session()
 URL = "https://www.mediawiki.org/w/api.php"
@@ -41,15 +68,13 @@ R = S.get(url=URL, params=PARAMS)
 DATA = R.json()
 LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
 #sys.stderr.write(LOGIN_TOKEN+'\n')
-#
 ##########
 
 def plugin_start(plugin_dir):
     """
     Load this plugin into EDMC
     """
-    sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))+'\n')
-    #print "Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))
+    #sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))+'\n')
     return 'ATEL'
 
 def plugin_prefs(parent):
@@ -61,9 +86,6 @@ def plugin_prefs(parent):
         VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
         columnspan=2, padx=PADX, sticky=tk.W)
-    #
-    # Todo - Add option to defer ATEL transmission until docked and cartographic data is sold.
-    #
     return frame
 
 def upgrade_callback():
@@ -97,7 +119,6 @@ def upgrade_callback():
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
-    sys.stderr.write("Someone clicked the button!\n")
     status.set("IGAU ATEL Submitted")
 
 def plugin_app(parent):
@@ -118,20 +139,15 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
 # What we're really after are unique discoveries.
     if entry['event'] == 'CodexEntry':
         # We discovered something!
-        # Lines 111, and 112 might not work the way I think they should. I don't know "tuple" well.
-            sys.stderr.write("{}: Discovered {} in {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
+        # The lines below might not work the way I think they should. I don't know "tuple" well.
             status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
             nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
-        # FSDJump happens often enough in the journal to use for debugging purposes.
-        # remove/comment out after CodexDiscovery function is finished.
+        # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
                 # We arrived at a new system!
-                    sys.stderr.write("Arrived in: {}\n".format(entry['StarSystem']))
-                    status.set("Arrived in: {}\n".format(entry['StarSystem']))
-                    nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
-                    columnspan=2, padx=PADX, sticky=tk.W)
+                    status.set("Waiting for COVAS data...")
 
 def plugin_stop():
     """
