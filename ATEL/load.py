@@ -130,7 +130,7 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    status.set("[ATEL] Waiting for COVAS feed...")
+    status.set("Waiting for COVAS data...")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
@@ -141,7 +141,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # We discovered something!
         # The lines below might not work the way I think they should. I don't know "tuple" well.
             status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
-            nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
+            nb.Button(frame, text="Submit ATEL", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
