@@ -20,7 +20,7 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.10a'
+VERSION = '0.11a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 
 ############
@@ -115,15 +115,6 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
 #############################
-#
-# FSDJump happens often enough in the journal to use for debugging purposes.
-    if entry['event'] == 'FSDJump':
-        # We arrived at a new system!
-            sys.stderr.write("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
-            status.set("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
-
-##############################
-#
 # What we're really after are unique discoveries.
     if entry['event'] == 'CodexDiscovery':
         # We discovered something!
@@ -133,6 +124,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             nb.Label(frame).grid()  # spacer
             nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
+    else:
+        # FSDJump happens often enough in the journal to use for debugging purposes.
+        # remove/comment out after CodexDiscovery function is finished.
+            if entry['event'] == 'FSDJump':
+                # We arrived at a new system!
+                    sys.stderr.write("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
+                    status.set("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
 
 def plugin_stop():
     """
