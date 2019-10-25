@@ -20,8 +20,9 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.11a'
+VERSION = '0.15a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
+PADX = 10  # formatting
 
 ############
 #
@@ -52,7 +53,6 @@ def plugin_start(plugin_dir):
     return 'ATEL'
 
 def plugin_prefs(parent):
-    PADX = 10  # formatting
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
@@ -116,12 +116,12 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
 
 #############################
 # What we're really after are unique discoveries.
-    if entry['event'] == 'CodexDiscovery':
+    if entry['event'] == 'CodexEntry':
         # We discovered something!
         # Lines 111, and 112 might not work the way I think they should. I don't know "tuple" well.
-            sys.stderr.write("{} Discovered on {},{}\n".format(entry['Discovered'],['System'],['Body']))
-            status.set("{} Discovered on {},{}\n".format(entry['Discovered'],['System'],['Body']))
-            nb.Label(frame).grid()  # spacer
+            sys.stderr.write("{}: Discovered {} on {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
+            status.set("{}: Discovered {} on {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
+            #nb.Label(frame).grid()  # spacer
             nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
