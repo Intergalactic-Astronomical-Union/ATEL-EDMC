@@ -59,7 +59,6 @@ def plugin_prefs(parent):
                    url='https://github.com/Elite-IGAU/ATEL-EDMC', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
     nb.Label(frame, text="ATEL {VER}".format(
         VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Label(frame).grid()  # spacer
     nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
         columnspan=2, padx=PADX, sticky=tk.W)
     #
@@ -99,6 +98,7 @@ def upgrade_callback():
 
 def bulletin_callback():
     sys.stderr.write("Someone clicked the button!\n")
+    status.set("IGAU ATEL Submitted")
 
 def plugin_app(parent):
     """
@@ -119,9 +119,8 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
     if entry['event'] == 'CodexEntry':
         # We discovered something!
         # Lines 111, and 112 might not work the way I think they should. I don't know "tuple" well.
-            sys.stderr.write("{}: Discovered {} on {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
-            status.set("{}: Discovered {} on {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
-            #nb.Label(frame).grid()  # spacer
+            sys.stderr.write("{}: Discovered {} in {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
+            status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
             nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
@@ -129,8 +128,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # remove/comment out after CodexDiscovery function is finished.
             if entry['event'] == 'FSDJump':
                 # We arrived at a new system!
-                    sys.stderr.write("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
-                    status.set("(Debug) Arrived at: {}\n".format(entry['StarSystem']))
+                    sys.stderr.write("Arrived in: {}\n".format(entry['StarSystem']))
+                    status.set("Arrived in: {}\n".format(entry['StarSystem']))
+                    nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
+                    columnspan=2, padx=PADX, sticky=tk.W)
 
 def plugin_stop():
     """
