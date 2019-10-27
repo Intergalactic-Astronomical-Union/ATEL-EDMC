@@ -49,7 +49,7 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.16a'
+VERSION = '0.18a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 PADX = 10  # formatting
 
@@ -119,8 +119,8 @@ def upgrade_callback():
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
-    status.set("IGAU ATEL Submitted")
-    sys.stderr.write("ATEL Data Transmitted: {},{},{}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
+    status.set("[NOOP] IGAU ATEL Submitted")
+    sys.stderr.write("[NOOP] ATEL Submission Button Clicked")
 
 def plugin_app(parent):
     """
