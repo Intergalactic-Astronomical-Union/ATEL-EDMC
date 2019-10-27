@@ -49,7 +49,7 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.15a'
+VERSION = '0.16a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 PADX = 10  # formatting
 
@@ -120,6 +120,7 @@ def upgrade_callback():
 
 def bulletin_callback():
     status.set("IGAU ATEL Submitted")
+    sys.stderr.write("ATEL Data Transmitted: {},{},{}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
 
 def plugin_app(parent):
     """
@@ -139,8 +140,8 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
 # What we're really after are unique discoveries.
     if entry['event'] == 'CodexEntry':
         # We discovered something!
-        # The lines below might not work the way I think they should. I don't know "tuple" well.
-            status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],['Name_Localised'],['System']))
+            status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
+            sys.stderr.write("Data sent to server: {},{},{}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
             nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
