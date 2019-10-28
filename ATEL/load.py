@@ -52,11 +52,11 @@ status = tk.StringVar()
 VERSION = '0.20a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
+WIKI_URL = "https://www.mediawiki.org/w/api.php"
 PADX = 10  # formatting
 
 # mediawiki token request
 S = requests.Session()
-URL = "https://www.mediawiki.org/w/api.php"
 
 PARAMS = {
     "action": "query",
@@ -65,10 +65,10 @@ PARAMS = {
     "format": "json"
 }
 
-R = S.get(url=URL, params=PARAMS)
+R = S.get(url=WIKI_URL, params=PARAMS)
 DATA = R.json()
 LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
-#sys.stderr.write(LOGIN_TOKEN+'\n')
+sys.stderr.write(LOGIN_TOKEN + '\n')
 ##########
 
 def plugin_start(plugin_dir):
@@ -162,8 +162,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             # extracting response text
             db_response = r.text
             #sys.stderr.write("Server Response:%s"%db_response)
-            nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
-            columnspan=2, padx=PADX, sticky=tk.W)
+            #
+            # disable the ATEL button since it doesn't work right now.
+            #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+            #columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
