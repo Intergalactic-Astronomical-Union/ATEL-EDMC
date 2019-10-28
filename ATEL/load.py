@@ -49,8 +49,9 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.18a'
+VERSION = '0.20a'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
+IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 PADX = 10  # formatting
 
 # mediawiki token request
@@ -142,6 +143,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # We discovered something!
             status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
             sys.stderr.write("Data sent to server: {},{},{}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
+            # data to be sent to api
+            data = {'timestamp': timestamp, 'Name_Localised': Name_Localised, 'System': System}
+            # sending post request and saving response as response object
+            r = requests.post(url = IGAU_API, data = data)
+            # extracting response text
+            db_response = r.text
+            print("Server Response:%s"%db_response)
             nb.Button(frame, text="Submit Discovery Report", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
