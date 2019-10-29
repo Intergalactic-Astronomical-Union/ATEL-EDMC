@@ -49,10 +49,10 @@ import urllib2
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.20a'
-this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/master/ATEL/load.py"
+VERSION = '0.5b'
+IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
-WIKI_URL = "https://www.mediawiki.org/w/api.php"
+IGAU_WIKI = "https://www.mediawiki.org/w/api.php"
 PADX = 10  # formatting
 
 # mediawiki token request
@@ -65,26 +65,22 @@ PARAMS = {
     "format": "json"
 }
 
-R = S.get(url=WIKI_URL, params=PARAMS)
+R = S.get(url=IGAU_WIKI, params=PARAMS)
 DATA = R.json()
 LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
-sys.stderr.write(LOGIN_TOKEN + '\n')
+#sys.stderr.write(LOGIN_TOKEN + '\n')
 ##########
 
 def plugin_start(plugin_dir):
-    """
-    Load this plugin into EDMC
-    """
-    #sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))+'\n')
+    sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))+'\n')
     return 'ATEL'
 
 def plugin_prefs(parent):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
-                   url='https://github.com/Elite-IGAU/ATEL-EDMC', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Label(frame, text="ATEL {VER}".format(
-        VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+                   url='https://github.com/Elite-IGAU/ATEL-EDMC/tree/latest', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
         columnspan=2, padx=PADX, sticky=tk.W)
     return frame
@@ -94,7 +90,7 @@ def upgrade_callback():
     this_filepath, this_extension = os.path.splitext(this_fullpath)
     corrected_fullpath = this_filepath + ".py"
     try:
-        response = requests.get(this.github)
+        response = requests.get(IGAU_GITHUB)
         if (response.status_code == 200):
             with open(corrected_fullpath, "wb") as f:
                 f.seek(0)
@@ -106,27 +102,23 @@ def upgrade_callback():
                 msginfo = ['Upgrade has completed sucessfully.',
                            'Please close and restart EDMC']
                 tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
-            sys.stderr.write("Finished plugin upgrade!\n")
+            #sys.stderr.write("Finished plugin upgrade!\n")
 
         else:
             msginfo = ['Upgrade failed. Bad server response',
                        'Please try again']
             tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
     except:
-        sys.stderr.writelines(
-            "Upgrade problem when fetching the remote data: {E}\n".format(E=sys.exc_info()[0]))
+        #sys.stderr.writelines("Upgrade problem when fetching the remote data: {E}\n".format(E=sys.exc_info()[0]))
         msginfo = ['Upgrade encountered a problem.',
                    'Please try again, and restart if problems persist']
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
     status.set("[NOOP] IGAU ATEL Submitted")
-    sys.stderr.write("[NOOP] ATEL Submission Button Clicked")
+    #sys.stderr.write("[NOOP] ATEL Submission Button Clicked")
 
 def plugin_app(parent):
-    """
-    Create a pair of TK widgets for the EDMC main window
-    """
     this.parent = parent
     this.frame = tk.Frame(parent)
     this.frame.columnconfigure(2, weight=1)
@@ -136,7 +128,6 @@ def plugin_app(parent):
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
-
 #############################
 # What we're really after are unique discoveries.
     if entry['event'] == 'CodexEntry':
@@ -164,6 +155,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             #sys.stderr.write("Server Response:%s"%db_response)
             #
             # disable the ATEL button since it doesn't work right now.
+            #
             #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
             #columnspan=2, padx=PADX, sticky=tk.W)
     else:
@@ -173,7 +165,4 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     status.set("Waiting for COVAS data...")
 
 def plugin_stop():
-    """
-    EDMC is closing
-    """
     sys.stderr.write("Shutting down.")
