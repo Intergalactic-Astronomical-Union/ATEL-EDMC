@@ -5,18 +5,21 @@ A simple EDMC plugin to collect codex discovery information and facilitate Astro
 (https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams)
 
 
-Installation Instructions: 
+
+Installation instructions:
+(Requires EDMC: https://github.com/Marginal/EDMarketConnector/releases/latest )
 
 
-1.) Open EDMC
+Open EDMC
 
-2.) File -> Settings -> [Plugins] Click [Open] button next to the plugins folder directory. 
+Click File -> Settings -> [Plugins]
 
-3.) Create directory called "ATEL" 
+Click [Open] next to the Plugins folder listing. 
 
-4.) Open ATEL directory and place this file: (https://github.com/Elite-IGAU/ATEL-EDMC/blob/master/ATEL/load.py) into the directory.
+Unpack ATEL.zip into the plugins folder. 
 
-5.)Restart EDMC
+Restart EDMC
+
 
 
 
