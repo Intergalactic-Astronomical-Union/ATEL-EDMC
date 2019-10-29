@@ -134,20 +134,8 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # We discovered something!
             status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
             #sys.stderr.write("Discovery Data: {},{},{}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
-            DATA_START = ('{')
-            DATA_STR1 = ('\"timestamp\":\"')
-            DATA_STR1_1 = ("{}".format(entry['timestamp']))
-            DATA_STR1_2 = ("\",")
-            DATA_STR2 = ('\"Name_Localised\":\"')
-            DATA_STR2_1 = ("{}".format(entry['Name_Localised']))
-            DATA_STR2_2 = ("\",")
-            DATA_STR3 = ('\"System\":\"')
-            DATA_STR3_1 = ("{}".format(entry['System']))
-            DATA_STR3_2 = ("\"")
-            DATA_END = ('}')
-            DATA_STR = DATA_START + DATA_STR1 + DATA_STR1_1 + DATA_STR1_2 + DATA_STR2 + DATA_STR2_1 + DATA_STR2_2 + DATA_STR3 + DATA_STR3_1 + DATA_STR3_2 + DATA_END
+            DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             # data to be sent to api
-            # this is why I HATE PYTHON 3..... strings shouldn't BE this hard.
             #
             r = requests.post(url = IGAU_API, data = DATA_STR)
             # extracting response text
