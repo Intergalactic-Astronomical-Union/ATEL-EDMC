@@ -46,14 +46,18 @@ import webbrowser
 from collections import defaultdict
 import threading
 import urllib2
+import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
 VERSION = '0.5b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
-IGAU_WIKI = "https://www.mediawiki.org/w/api.php"
+WIKI_AUTH = "https://www.mediawiki.org/w/api.php"
+IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
 PADX = 10  # formatting
+ts = time.time()
+jd = ts / 86400 + 2440587.5
 
 # mediawiki token request
 S = requests.Session()
@@ -65,10 +69,10 @@ PARAMS = {
     "format": "json"
 }
 
-R = S.get(url=IGAU_WIKI, params=PARAMS)
+R = S.get(url=WIKI_AUTH, params=PARAMS)
 DATA = R.json()
 LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
-#sys.stderr.write(LOGIN_TOKEN + '\n')
+sys.stderr.write(LOGIN_TOKEN + '\n')
 ##########
 
 def plugin_start(plugin_dir):
@@ -115,8 +119,12 @@ def upgrade_callback():
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
-    status.set("[NOOP] IGAU ATEL Submitted")
-    #sys.stderr.write("[NOOP] ATEL Submission Button Clicked")
+    #ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
+    ATEL_DATA = 'action=edit&title=GBET%20'+jd+'&category=GBET&text=Testing%20GBET%20ATEL%20function&token='+LOGIN_TOKEN
+    ATEL_POST = S.get(url=IGAU_WIKI, params=ATEL_DATA)
+    status.set("IGAU ATEL Submitted")
+    sys.stderr.write("ATEL Submission Button Clicked by:"+cmdr+"\n")
+    sys.stderr.write("ATEL Data Sent: "+IGAU_WIKI+ATEL_DATA)
 
 def plugin_app(parent):
     this.parent = parent
@@ -144,8 +152,8 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             #
             # disable the ATEL button since it doesn't work right now.
             #
-            #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
-            #columnspan=2, padx=PADX, sticky=tk.W)
+            nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+            columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
