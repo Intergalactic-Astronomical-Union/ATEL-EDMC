@@ -50,7 +50,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.5b'
+VERSION = '0.51b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 WIKI_AUTH = "https://www.mediawiki.org/w/api.php"
