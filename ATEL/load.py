@@ -50,33 +50,15 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.55b'
+VERSION = '0.6b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
-WIKI_AUTH = "https://www.mediawiki.org/w/api.php"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
 # Need to determine how to pull this from EDMC
 CMDR_DATA = "Unknown CMDR"
-# In case CMDR name has a space in it.
-CMDR_NAME = CMDR_DATA.replace(" ", "%20")
 PADX = 10  # formatting
 ts = time.time()
 jd = ts / 86400 + 2440587.5
-
-# mediawiki token request
-S = requests.Session()
-
-PARAMS = {
-    "action": "query",
-    "meta": "tokens",
-    "type": "login",
-    "format": "json"
-}
-
-R = S.get(url=WIKI_AUTH, params=PARAMS)
-AUTH_DATA = R.json()
-LOGIN_TOKEN = AUTH_DATA['query']['tokens']['logintoken']
-##########
 
 def plugin_start(plugin_dir):
     return 'ATEL'
@@ -119,14 +101,17 @@ def upgrade_callback():
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
-    # Set to NOOP since there's something wrong with how python is sending the data to Fandom wiki.
-    # A curl -X POST command using the data generated (IGAU_WIKI+ATEL_DATA) will succeed, however the python requests.post function isn't working correctly, and results in a failure.
-    ATEL_DATA = '?action=edit&title=GBET%20'+str(jd)+'&category=GBET&text=Testing%20GBET%20ATEL%20function%20Submitted%20by%20'+CMDR_NAME+'&token=%2B\\'
+    # Looks like the only way to get this to work is to embrce the icky JSON fad.
+    ATEL_DATA = {
+        'action': 'edit',
+        'title': 'GBET '+str(jd)+': '+this.system,
+        'category': 'GBET',
+        'text': 'At time index: '+this.timestamp+', '+CMDR_DATA+' reports [PHENOMENA] in system '+this.system+'',
+        'token': '+\\',
+        'format': 'json'
+    }
     ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
-    status.set("IGAU ATEL Submitted")
-    sys.stderr.write("ATEL Submission Button Clicked by:"+CMDR_NAME+"\n")
-    sys.stderr.write("ATEL Data Sent: "+IGAU_WIKI+ATEL_DATA+"\n")
-    sys.stderr.write("IGAU WIKI RESPONSE: "+(ATEL_POST.text)+"\n")
+    status.set("IGAU ATEL "+str(jd)+" Submitted")
 
 def plugin_app(parent):
     this.parent = parent
@@ -135,6 +120,9 @@ def plugin_app(parent):
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
     status.set("Waiting for COVAS data...")
+    #Submit ATEL Button
+    nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+    columnspan=2, padx=PADX, sticky=tk.W)
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
@@ -148,15 +136,19 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             r = requests.post(url = IGAU_API, data = DATA_STR)
             # extracting response text
             db_response = r.text
-            # GBET ATEL Submission Button - Tracked in Issue #1 on GitHub - Not sure how to "vanish" the button after submitting ATEL
-            # Disabled for now, pending additional debugging
-            #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
-            #columnspan=2, padx=PADX, sticky=tk.W)
+            #Submit ATEL Button
+            nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+            columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
                 # We arrived at a new system!
                     status.set("Waiting for COVAS data...")
+                    this.system=(format(entry['StarSystem']))
+                    this.timestamp=(format(entry['timestamp']))
+                    #Submit ATEL Button
+                    nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+                    columnspan=2, padx=PADX, sticky=tk.W)
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
