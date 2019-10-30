@@ -50,7 +50,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.51b'
+VERSION = '0.52b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 WIKI_AUTH = "https://www.mediawiki.org/w/api.php"
@@ -72,7 +72,6 @@ PARAMS = {
 R = S.get(url=WIKI_AUTH, params=PARAMS)
 DATA = R.json()
 LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
-sys.stderr.write(LOGIN_TOKEN + '\n')
 ##########
 
 def plugin_start(plugin_dir):
@@ -120,7 +119,7 @@ def upgrade_callback():
 
 def bulletin_callback():
     #ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
-    ATEL_DATA = 'action=edit&title=GBET%20'+jd+'&category=GBET&text=Testing%20GBET%20ATEL%20function&token='+LOGIN_TOKEN
+    ATEL_DATA = 'action=edit&title=GBET%20'+jd+'&category=GBET&text=Testing%20GBET%20ATEL%20function&token=%2B\\'
     ATEL_POST = S.get(url=IGAU_WIKI, params=ATEL_DATA)
     status.set("IGAU ATEL Submitted")
     sys.stderr.write("ATEL Submission Button Clicked by:"+cmdr+"\n")
