@@ -50,7 +50,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.52b'
+VERSION = '0.53b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 WIKI_AUTH = "https://www.mediawiki.org/w/api.php"
@@ -75,7 +75,6 @@ LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
 ##########
 
 def plugin_start(plugin_dir):
-    sys.stderr.write("Plugin loaded from: {}".format(plugin_dir.encode("utf-8"))+'\n')
     return 'ATEL'
 
 def plugin_prefs(parent):
@@ -105,20 +104,17 @@ def upgrade_callback():
                 msginfo = ['Upgrade has completed sucessfully.',
                            'Please close and restart EDMC']
                 tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
-            #sys.stderr.write("Finished plugin upgrade!\n")
 
         else:
             msginfo = ['Upgrade failed. Bad server response',
                        'Please try again']
             tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
     except:
-        #sys.stderr.writelines("Upgrade problem when fetching the remote data: {E}\n".format(E=sys.exc_info()[0]))
         msginfo = ['Upgrade encountered a problem.',
                    'Please try again, and restart if problems persist']
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
-    #ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
     ATEL_DATA = 'action=edit&title=GBET%20'+jd+'&category=GBET&text=Testing%20GBET%20ATEL%20function&token=%2B\\'
     ATEL_POST = S.get(url=IGAU_WIKI, params=ATEL_DATA)
     status.set("IGAU ATEL Submitted")
@@ -140,17 +136,12 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
     if entry['event'] == 'CodexEntry':
         # We discovered something!
             status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
-            #sys.stderr.write("Discovery Data: {},{},{}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
-            DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             # data to be sent to api
-            #
+            DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
             # extracting response text
             db_response = r.text
-            #sys.stderr.write("Server Response:%s"%db_response)
-            #
-            # disable the ATEL button since it doesn't work right now.
-            #
+            # GBET ATEL Submission Button - Tracked in Issue #1 on GitHub - Not sure how to "vanish" the button after submitting ATEL
             nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
