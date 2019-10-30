@@ -50,11 +50,15 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.53b'
+VERSION = '0.55b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 WIKI_AUTH = "https://www.mediawiki.org/w/api.php"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
+# Need to determine how to pull this from EDMC
+CMDR_DATA = "Unknown CMDR"
+# In case CMDR name has a space in it.
+CMDR_NAME = CMDR_DATA.replace(" ", "%20")
 PADX = 10  # formatting
 ts = time.time()
 jd = ts / 86400 + 2440587.5
@@ -70,8 +74,8 @@ PARAMS = {
 }
 
 R = S.get(url=WIKI_AUTH, params=PARAMS)
-DATA = R.json()
-LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
+AUTH_DATA = R.json()
+LOGIN_TOKEN = AUTH_DATA['query']['tokens']['logintoken']
 ##########
 
 def plugin_start(plugin_dir):
@@ -115,11 +119,14 @@ def upgrade_callback():
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def bulletin_callback():
-    ATEL_DATA = 'action=edit&title=GBET%20'+jd+'&category=GBET&text=Testing%20GBET%20ATEL%20function&token=%2B\\'
-    ATEL_POST = S.get(url=IGAU_WIKI, params=ATEL_DATA)
+    # Set to NOOP since there's something wrong with how python is sending the data to Fandom wiki.
+    # A curl -X POST command using the data generated (IGAU_WIKI+ATEL_DATA) will succeed, however the python requests.post function isn't working correctly, and results in a failure.
+    ATEL_DATA = '?action=edit&title=GBET%20'+str(jd)+'&category=GBET&text=Testing%20GBET%20ATEL%20function%20Submitted%20by%20'+CMDR_NAME+'&token=%2B\\'
+    ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
     status.set("IGAU ATEL Submitted")
-    sys.stderr.write("ATEL Submission Button Clicked by:"+cmdr+"\n")
-    sys.stderr.write("ATEL Data Sent: "+IGAU_WIKI+ATEL_DATA)
+    sys.stderr.write("ATEL Submission Button Clicked by:"+CMDR_NAME+"\n")
+    sys.stderr.write("ATEL Data Sent: "+IGAU_WIKI+ATEL_DATA+"\n")
+    sys.stderr.write("IGAU WIKI RESPONSE: "+(ATEL_POST.text)+"\n")
 
 def plugin_app(parent):
     this.parent = parent
@@ -142,8 +149,9 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             # extracting response text
             db_response = r.text
             # GBET ATEL Submission Button - Tracked in Issue #1 on GitHub - Not sure how to "vanish" the button after submitting ATEL
-            nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
-            columnspan=2, padx=PADX, sticky=tk.W)
+            # Disabled for now, pending additional debugging
+            #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+            #columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
