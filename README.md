@@ -7,7 +7,7 @@ A simple EDMC plugin to collect codex discovery information and facilitate Astro
 
 
 Installation instructions:
-(Requires EDMC: https://github.com/Marginal/EDMarketConnector/releases/latest )
+(Requires EDMC 3.4.3 or newer: https://github.com/Marginal/EDMarketConnector/releases/latest )
 
 
 Open EDMC
