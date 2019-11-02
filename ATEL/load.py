@@ -50,12 +50,10 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.6b'
+VERSION = '0.62b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
-# Need to determine how to pull this from EDMC
-CMDR_DATA = "Unknown CMDR"
 PADX = 10  # formatting
 ts = time.time()
 jd = ts / 86400 + 2440587.5
@@ -100,13 +98,16 @@ def upgrade_callback():
                    'Please try again, and restart if problems persist']
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
+def dashboard_entry(cmdr, is_beta, entry):
+    this.cmdr = cmdr
+
 def bulletin_callback():
     # Looks like the only way to get this to work is to embrce the icky JSON fad.
     ATEL_DATA = {
         'action': 'edit',
         'title': 'GBET '+str(jd)+': '+this.system,
         'category': 'GBET',
-        'text': 'At time index: '+this.timestamp+', '+CMDR_DATA+' reports [PHENOMENA] in system '+this.system+'',
+        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports ' +this.name+' in system '+this.system+'',
         'token': '+\\',
         'format': 'json'
     }
@@ -130,8 +131,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
 # What we're really after are unique discoveries.
     if entry['event'] == 'CodexEntry':
         # We discovered something!
+            this.cmdr = cmdr
+            entry['commanderName'] = cmdr
             status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
             # data to be sent to api
+            this.name=(format(entry['Name_Localised']))
+            this.system=(format(entry['System']))
+            this.timestamp=(format(entry['timestamp']))
             DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
             # extracting response text
@@ -146,9 +152,11 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     status.set("Waiting for COVAS data...")
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
-                    #Submit ATEL Button
-                    nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
-                    columnspan=2, padx=PADX, sticky=tk.W)
+                    this.name = 'unknown entity'
+                    #
+                    #How do we clear the ATEL Button???
+                    #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+                    #columnspan=2, padx=PADX, sticky=tk.W)
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
