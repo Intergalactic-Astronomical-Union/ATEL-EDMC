@@ -50,7 +50,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.62b'
+VERSION = '0.65b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
@@ -107,7 +107,7 @@ def bulletin_callback():
         'action': 'edit',
         'title': 'GBET '+str(jd)+': '+this.system,
         'category': 'GBET',
-        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports ' +this.name+' in system '+this.system+'',
+        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports '+this.name+' in system '+this.system+' via ATEL-EDMC ( Version '+VERSION+' ).',
         'token': '+\\',
         'format': 'json'
     }
