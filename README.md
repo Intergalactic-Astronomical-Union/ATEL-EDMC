@@ -1,5 +1,5 @@
 # ATEL-EDMC
-A simple EDMC plugin to collect codex discovery information and facilitate Astronomical "telegram" style discovery notices for publication by the Intergalactic Astronomical Union. 
+A simple EDMC plugin to automatically collect codex discovery information and facilitate Astronomical "telegram" style discovery notices for publication by the Intergalactic Astronomical Union. 
 
 
 (https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams)
