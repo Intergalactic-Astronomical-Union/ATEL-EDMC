@@ -17,10 +17,3 @@ Click [Open] next to the Plugins folder listing.
 Unpack ATEL.zip into the plugins folder.
 
 Restart EDMC
-
-
-
-
-
-
-
