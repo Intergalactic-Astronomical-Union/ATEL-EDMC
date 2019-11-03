@@ -1,32 +1,37 @@
 ###############################################################################
-# A simple EDMC plugin to transmit CodexEntry data from the CMDR journal
-# to the Intergalactic Astronomical Union for record keeping, and scientific
-# purposes.
+# A simple EDMC plugin to automatically transmit CodexEntry data from the
+# CMDR journal to the Intergalactic Astronomical Union for record keeping,
+# and scientific purposes.
 #
 # Discoveries DO NOT have CMDR data attached to them unless a CMDR chooses to
 # submit a public Astronomical Telegram - a short "postcard" style anouncement
 # which can be used to immediately announce UNIQUE discoveries above and beyond
-# normal discoveries (geysers, lava spouts, terraformable HMC's, water worlds, etc.)
+# normal Codex (geysers, lava spouts, terraformable HMC's, etc.) discoveries
+# which are autmoatically sent to IGAU by this plugin
 #
 # ATEL notices are available at:
 # https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams
+#
+# Data Catalog available at:
+# https://raw.githubusercontent.com/Elite-IGAU/publications/master/IGAU_Codex.csv
+#
+# Source Code availble for review at:
+# https://github.com/Elite-IGAU/ATEL-EDMC
 #
 # DATA COLLECTION NOTICE:
 # IGAU only stores the following data:
 # discovery date/time, discovery name, and discovery location.
 #
-# code availble for review at:
-# https://github.com/Elite-IGAU/ATEL-EDMC
-#
-# please submit bug reports or issues at:
+# Please submit bug reports or issues at:
 # https://github.com/Elite-IGAU/ATEL-EDMC/issues
 #
 # Special thanks to:
 #
 # Mobius PVE (https://elitepve.com/) for their assistance
-# Otis B. EDMC (http://edcodex.info/?m=tools&entry=150)
+# Otis B. EDMC (http://edcodex.info/?m=tools&entry=150) for EDMC plugin docs
+#
 # The many wonderful explorers that make the Intergalactic Astronomical Union
-# a productive and enjoyable Elite Dangerous PVE squadron.
+# [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
 #
 ###############################################################################
 
@@ -111,6 +116,7 @@ def bulletin_callback():
         'token': '+\\',
         'format': 'json'
     }
+
     ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
     status.set("ATEL "+str(jd)+" Transmitted")
 
@@ -120,7 +126,8 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    status.set("Discover something interesting and unique? \n Click the button below to report it!")
+    status.set("Discover something interesting? \n  Click the button below to report it!")
+
     #Submit ATEL Button
     nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
     columnspan=2, padx=PADX, sticky=tk.W)
@@ -129,21 +136,26 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 #############################
 # What we're really after are unique discoveries.
+
     if entry['event'] == 'CodexEntry':
         # We discovered something!
             this.cmdr = cmdr
             entry['commanderName'] = cmdr
+
             # We don't need to announce discoveries to the client - should work quietly in the background.
             #status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
-            status.set("Discover something interesting and unique? \n Click the button below to report it!")
+            status.set("Discover something interesting? \n  Click the button below to report it!")
+
             # data to be sent to api
             this.name=(format(entry['Name_Localised']))
             this.system=(format(entry['System']))
             this.timestamp=(format(entry['timestamp']))
             DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
+
             # extracting response text
             db_response = r.text
+
             #Submit ATEL Button
             nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
@@ -151,12 +163,14 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
                 # We arrived at a new system!
-                    status.set("Discover something interesting and unique? \n Click the button below to report it!")
+                    this.cmdr = cmdr
+                    entry['commanderName'] = cmdr
+
+                    status.set("Discover something interesting? \n  Click the button below to report it!")
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
                     this.name = 'Unknown Entity'
-                    #
-                    #How do we clear the ATEL Button???
+
                     nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
                     columnspan=2, padx=PADX, sticky=tk.W)
 
