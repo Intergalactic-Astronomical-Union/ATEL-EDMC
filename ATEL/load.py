@@ -50,7 +50,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.65b'
+VERSION = '0.67b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
@@ -112,7 +112,7 @@ def bulletin_callback():
         'format': 'json'
     }
     ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
-    status.set("IGAU ATEL "+str(jd)+" Submitted")
+    status.set("ATEL "+str(jd)+" Transmitted")
 
 def plugin_app(parent):
     this.parent = parent
@@ -120,9 +120,9 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    status.set("Waiting for COVAS data...")
+    status.set("Discover something interesting and unique? \n Click the button below to report it!")
     #Submit ATEL Button
-    nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+    nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
     columnspan=2, padx=PADX, sticky=tk.W)
     return this.frame
 
@@ -133,7 +133,9 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # We discovered something!
             this.cmdr = cmdr
             entry['commanderName'] = cmdr
-            status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
+            # We don't need to announce discoveries to the client - should work quietly in the background.
+            #status.set("{}: Discovered {} in {}\n".format(entry['timestamp'],entry['Name_Localised'],entry['System']))
+            status.set("Discover something interesting and unique? \n Click the button below to report it!")
             # data to be sent to api
             this.name=(format(entry['Name_Localised']))
             this.system=(format(entry['System']))
@@ -143,20 +145,20 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             # extracting response text
             db_response = r.text
             #Submit ATEL Button
-            nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
+            nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
                 # We arrived at a new system!
-                    status.set("Waiting for COVAS data...")
+                    status.set("Discover something interesting and unique? \n Click the button below to report it!")
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
-                    this.name = 'unknown entity'
+                    this.name = 'Unknown Entity'
                     #
                     #How do we clear the ATEL Button???
-                    #nb.Button(frame, text="Submit IGAU ATEL (Discovery Report)", command=bulletin_callback).grid(row=10, column=0,
-                    #columnspan=2, padx=PADX, sticky=tk.W)
+                    nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
+                    columnspan=2, padx=PADX, sticky=tk.W)
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
