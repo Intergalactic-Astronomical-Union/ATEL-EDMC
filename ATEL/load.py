@@ -55,7 +55,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '0.67b'
+VERSION = '0.70b'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
@@ -126,11 +126,7 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    status.set("Discover something interesting? \n  Click the button below to report it!")
-
-    #Submit ATEL Button
-    nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
-    columnspan=2, padx=PADX, sticky=tk.W)
+    status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
