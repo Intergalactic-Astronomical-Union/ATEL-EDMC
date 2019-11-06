@@ -76,7 +76,7 @@ def plugin_prefs(parent):
     nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
-def upgrade_callback():
+#def upgrade_callback():
     #
     # disabled - pending rewite to do this automagically.
     #
