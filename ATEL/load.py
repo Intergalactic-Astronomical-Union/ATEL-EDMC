@@ -57,13 +57,13 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 status = tk.StringVar()
-VERSION = '1.0-RC1'
+VERSION = '1.0-RC2'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
 PADX = 10  # formatting
-ts = time.time()
-jd = ts / 86400 + 2440587.5
+this.ts = time.time()
+this.jd = this.ts / 86400 + 2440587.5
 
 def plugin_start(plugin_dir):
     return 'ATEL'
@@ -110,6 +110,9 @@ def dashboard_entry(cmdr, is_beta, entry):
     this.cmdr = cmdr
 
 def bulletin_callback():
+    # update the current time, otherwise ATEL notices will all have the same timestamp
+    this.ts = time.time()
+    this.jd = this.ts / 86400 + 2440587.5
     # I guess the only way to get this to work is to embrace the icky JSON fad.
     ATEL_DATA = {
         'action': 'edit',
