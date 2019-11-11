@@ -59,7 +59,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.ts = time.time()
 this.jd = this.ts / 86400 + 2440587.5
-VERSION = '1.02'
+VERSION = '1.03'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -72,16 +72,15 @@ def plugin_start(plugin_dir):
 def plugin_prefs(parent):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
+    # We can do a manual upgrade check in the settings tab.
+    v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
+    CURRENT_VERSION = str(v.text)
+    nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
                    url='https://github.com/Elite-IGAU/ATEL-EDMC/releases', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    #v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    #CURRENT_VERSION = str(v.text)
-    #if (VERSION) == (CURRENT_VERSION):
-    #    nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    #else:
-    #    nb.Label(frame, text="New Version Available: ATEL {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    #    nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
-    #    columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
+    columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
 ##
