@@ -74,20 +74,20 @@ def plugin_prefs(parent):
     frame.columnconfigure(5, weight=1)
     HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
                    url='https://github.com/Elite-IGAU/ATEL-EDMC/releases', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    CURRENT_VERSION = str(v.text)
-    if (VERSION) == (CURRENT_VERSION):
-        nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    else:
-        nb.Label(frame, text="New Version Available: ATEL {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-        nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
-        columnspan=2, padx=PADX, sticky=tk.W)
+    #v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
+    #CURRENT_VERSION = str(v.text)
+    #if (VERSION) == (CURRENT_VERSION):
+    #    nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    #else:
+    #    nb.Label(frame, text="New Version Available: ATEL {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    #    nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
+    #    columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
 ##
 #
 # I think a good portion of this code can be used to check for updates at startup.
-# We have the version check working, so it should just be a matter of adding some
+# We have the version check working (sort of), so it should just be a matter of adding some
 # of the upgrade code below to the version check if statement.
 #
 # We can call this code from the settings menu to do a manual update.
@@ -147,12 +147,17 @@ def plugin_app(parent):
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
     # we will do a version check here since this is the first status box that appears.
-    v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    CURRENT_VERSION = str(v.text)
-    if (VERSION) == (v):
-        this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
-    else:
-        this.status.set("ATEL-EDMC Version "+CURRENT_VERSION +" available, Please Upgrade")
+    #v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
+    #CURRENT_VERSION = str(v.text)
+    #if (VERSION) == (v):
+    #    this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
+    #else:
+    #    this.status.set("ATEL-EDMC Version "+CURRENT_VERSION +" available, Please Upgrade")
+    #
+    # disabled the version check at startup - something isn't being evaluated right,
+    # and the code ALWAYS thinks an upgrade is available.
+    #
+    this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
