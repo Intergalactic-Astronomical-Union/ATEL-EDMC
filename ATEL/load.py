@@ -73,43 +73,52 @@ def plugin_prefs(parent):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
-                   url='https://github.com/Elite-IGAU/ATEL-EDMC/tree/latest', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
+                   url='https://github.com/Elite-IGAU/ATEL-EDMC/releases', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
     v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    if int(VERSION) == int(v):
+    CURRENT_VERSION = str(v.text)
+    if (VERSION) == (CURRENT_VERSION):
         nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     else:
-        nb.Label(frame, text="ATEL {v}".format(v=v) ."available. Please upgrade.").grid(columnspan=2, padx=PADX, sticky=tk.W)
+        nb.Label(frame, text="New Version Available: ATEL {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+        nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
+        columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
-#def upgrade_callback():
-    #
-    # disabled - pending rewite to do this automagically.
-    #
-    #this_fullpath = os.path.realpath(__file__)
-    #this_filepath, this_extension = os.path.splitext(this_fullpath)
-    #corrected_fullpath = this_filepath + ".py"
-    #try:
-    #    response = requests.get(IGAU_GITHUB)
-    #    if (response.status_code == 200):
-    #        with open(corrected_fullpath, "wb") as f:
-    #            f.seek(0)
-    #            f.write(response.content)
-    #            f.truncate()
-    #            f.flush()
-    #            os.fsync(f.fileno())
-    #            this.upgrade_applied = True  # Latch on upgrade successful
-    #            msginfo = ['Upgrade has completed sucessfully.',
-    #                       'Please close and restart EDMC']
-    #            tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
+##
+#
+# I think a good portion of this code can be used to check for updates at startup.
+# We have the version check working, so it should just be a matter of adding some
+# of the upgrade code below to the version check if statement.
+#
+# We can call this code from the settings menu to do a manual update.
+#
+def upgrade_callback():
 
-    #    else:
-    #        msginfo = ['Upgrade failed. Bad server response',
-    #                   'Please try again']
-    #        tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
-    #except:
-    #    msginfo = ['Upgrade encountered a problem.',
-    #               'Please try again, and restart if problems persist']
-    #    tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
+    this_fullpath = os.path.realpath(__file__)
+    this_filepath, this_extension = os.path.splitext(this_fullpath)
+    corrected_fullpath = this_filepath + ".py"
+    try:
+        response = requests.get(IGAU_GITHUB)
+        if (response.status_code == 200):
+            with open(corrected_fullpath, "wb") as f:
+                f.seek(0)
+                f.write(response.content)
+                f.truncate()
+                f.flush()
+                os.fsync(f.fileno())
+                this.upgrade_applied = True  # Latch on upgrade successful
+                msginfo = ['Upgrade has completed sucessfully.',
+                           'Please close and restart EDMC']
+                tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
+
+        else:
+            msginfo = ['Upgrade failed. Bad server response',
+                       'Please try again']
+            tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
+    except:
+        msginfo = ['Upgrade encountered a problem.',
+                   'Please try again, and restart if problems persist']
+        tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def dashboard_entry(cmdr, is_beta, entry):
     this.cmdr = cmdr
@@ -139,10 +148,11 @@ def plugin_app(parent):
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
     # we will do a version check here since this is the first status box that appears.
     v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    if int(VERSION) == int(v):
+    CURRENT_VERSION = str(v.text)
+    if (VERSION) == (v):
         this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     else:
-        this.status.set("ATEL-EDMC Version "+v +" available. Please Upgrade.")
+        this.status.set("ATEL-EDMC Version "+CURRENT_VERSION +" available, Please Upgrade")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
