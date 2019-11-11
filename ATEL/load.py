@@ -56,14 +56,15 @@ import urllib2
 import time
 
 this = sys.modules[__name__]	# For holding module globals
-status = tk.StringVar()
-VERSION = '1.0-RC2'
+this.status = tk.StringVar()
+this.ts = time.time()
+this.jd = this.ts / 86400 + 2440587.5
+VERSION = '1.02'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
+IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
 PADX = 10  # formatting
-this.ts = time.time()
-this.jd = this.ts / 86400 + 2440587.5
 
 def plugin_start(plugin_dir):
     return 'ATEL'
@@ -73,7 +74,11 @@ def plugin_prefs(parent):
     frame.columnconfigure(5, weight=1)
     HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
                    url='https://github.com/Elite-IGAU/ATEL-EDMC/tree/latest', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
+    if int(VERSION) == int(v):
+        nb.Label(frame, text="ATEL {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    else:
+        nb.Label(frame, text="ATEL {v}".format(v=v) ."available. Please upgrade.").grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
 #def upgrade_callback():
@@ -124,7 +129,7 @@ def bulletin_callback():
     }
 
     ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
-    status.set("ATEL "+str(jd)+" Transmitted")
+    this.status.set("ATEL "+str(jd)+" Transmitted")
 
 def plugin_app(parent):
     this.parent = parent
@@ -132,7 +137,12 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
+    # we will do a version check here since this is the first status box that appears.
+    v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
+    if int(VERSION) == int(v):
+        this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
+    else:
+        this.status.set("ATEL-EDMC Version "+v +" available. Please Upgrade.")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
@@ -156,7 +166,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             r = requests.post(url = IGAU_API, data = DATA_STR)
 
             #Submit ATEL Button if CMDR wants to make a public discovery announcement.
-            status.set("Discover something interesting? \n  Click the button below to report it!")
+            this.status.set("Discover something interesting? \n  Click the button below to report it!")
             nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
@@ -173,7 +183,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     this.name = 'Unknown Entity'
 
                     #Submit ATEL Button if CMDR wants to make a public discovery announcement.
-                    status.set("Discover something interesting? \n  Click the button below to report it!")
+                    this.status.set("Discover something interesting? \n  Click the button below to report it!")
                     nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
                     columnspan=2, padx=PADX, sticky=tk.W)
 
