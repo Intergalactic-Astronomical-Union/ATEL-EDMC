@@ -59,7 +59,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.ts = time.time()
 this.jd = this.ts / 86400 + 2440587.5
-VERSION = '1.03'
+VERSION = '1.05'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -67,30 +67,24 @@ IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
 PADX = 10  # formatting
 
 def plugin_start(plugin_dir):
+    check_version()
     return 'ATEL'
 
 def plugin_prefs(parent):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
-    # We can do a manual upgrade check in the settings tab.
     v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
     CURRENT_VERSION = str(v.text)
     nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    HyperlinkLabel(frame, text='ATEL GitHub', background=nb.Label().cget('background'),
-                   url='https://github.com/Elite-IGAU/ATEL-EDMC/releases', underline=True).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Button(frame, text="UPGRADE", command=upgrade_callback).grid(row=10, column=0,
-    columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
-##
-#
-# I think a good portion of this code can be used to check for updates at startup.
-# We have the version check working (sort of), so it should just be a matter of adding some
-# of the upgrade code below to the version check if statement.
-#
-# We can call this code from the settings menu to do a manual update.
-#
+def check_version():
+    response = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
+    serverVersion = response.content.strip()
+    if serverVersion != VERSION:
+        upgrade_callback()
+
 def upgrade_callback():
 
     this_fullpath = os.path.realpath(__file__)
@@ -106,16 +100,16 @@ def upgrade_callback():
                 f.flush()
                 os.fsync(f.fileno())
                 this.upgrade_applied = True  # Latch on upgrade successful
-                msginfo = ['Upgrade has completed sucessfully.',
+                msginfo = ['ATEL-EDMC Upgrade has completed sucessfully.',
                            'Please close and restart EDMC']
                 tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
         else:
-            msginfo = ['Upgrade failed. Bad server response',
+            msginfo = ['ATEL-EDMC Upgrade failed. Bad server response',
                        'Please try again']
             tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
     except:
-        msginfo = ['Upgrade encountered a problem.',
+        msginfo = ['ATEL-EDMC Upgrade encountered a problem.',
                    'Please try again, and restart if problems persist']
         tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
@@ -145,25 +139,16 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    # we will do a version check here since this is the first status box that appears.
-    #v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    #CURRENT_VERSION = str(v.text)
-    #if (VERSION) == (v):
-    #    this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
-    #else:
-    #    this.status.set("ATEL-EDMC Version "+CURRENT_VERSION +" available, Please Upgrade")
-    #
-    # disabled the version check at startup - something isn't being evaluated right,
-    # and the code ALWAYS thinks an upgrade is available.
-    #
     this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 #############################
-# What we're really after are unique discoveries. TODO: Filter out "mundane"
-# CodexEntry events for stuff like Y-Type Dwarfs, HMC's, etc. These will generate
-# a CodexEntry event the first time a CMDR encounters one in a sector.
+# What we're really after are unique discoveries.
+#
+# TODO: Filter out "mundane" CodexEntry events for stuff like
+# Y-Type Dwarfs, HMC's, etc.
+# These will generate a CodexEntry event the first time a CMDR encounters one in a sector.
 #
 # Not an urgent fix because the data isn't entirely worthless.
 # (Black Holes, ELW's, WD/NS Herbigs, CS, are of interest.)
