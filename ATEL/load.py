@@ -7,7 +7,7 @@
 # submit a public Astronomical Telegram - a short "postcard" style anouncement
 # which can be used to immediately announce UNIQUE discoveries above and beyond
 # normal Codex (geysers, lava spouts, terraformable HMC's, etc.) discoveries
-# which are autmoatically sent to IGAU by this plugin
+# which are automatically sent to IGAU by this plugin
 #
 # ATEL notices are available at:
 # https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams
