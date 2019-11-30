@@ -1,4 +1,4 @@
-A simple EDMC plugin to automatically collect codex discovery information and facilitate Astronomical "telegram" style discovery notices for publication by the Intergalactic Astronomical Union. 
+A simple EDMC plugin to automatically collect codex discovery information and (optionally) transmit Astronomical "telegram" style discovery notices for publication by the Intergalactic Astronomical Union. 
 
 (https://elite-dangerous-iau.fandom.com/wiki/Data_Catalog)
 
