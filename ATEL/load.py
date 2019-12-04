@@ -139,7 +139,7 @@ def plugin_app(parent):
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
     # The ATEL Submit function can't initialize until we read the current system
     # from an 'FSDJump' journal event.  TODO: See if EDMC exposes "system" like it does "CMDR"
-    # we set the status below to let users know the plugin is loaded. 
+    # we set the status below to let users know the plugin is loaded.
     this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     return this.frame
 
@@ -159,7 +159,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
 
             # Submit ATEL Button if CMDR wants to make a public discovery announcement.
             # Updated wording to be more clear as to what people should be submitting.
-            this.status.set("Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
+            this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
             nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
@@ -175,7 +175,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     this.name = 'Unscanned Phenomena'
                     # Submit ATEL Button if CMDR wants to make a public discovery announcement.
                     # Updated wording to be more clear as to what people should be submitting.
-                    this.status.set("Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
+                    this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
                     nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
                     columnspan=2, padx=PADX, sticky=tk.W)
 
