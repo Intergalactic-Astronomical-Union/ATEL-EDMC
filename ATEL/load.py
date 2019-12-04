@@ -5,9 +5,8 @@
 #
 # Discoveries DO NOT have CMDR data attached to them unless a CMDR chooses to
 # submit a public Astronomical Telegram - a short "postcard" style anouncement
-# which can be used to immediately announce UNIQUE discoveries above and beyond
-# normal Codex (geysers, lava spouts, terraformable HMC's, etc.) discoveries
-# which are automatically sent to IGAU by this plugin
+# to immediately announce UNIQUE discoveries which are automatically
+# sent to IGAU by this plugin.
 #
 # ATEL notices are available at:
 # https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams
@@ -59,7 +58,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.ts = time.time()
 this.jd = this.ts / 86400 + 2440587.5
-VERSION = '1.06'
+VERSION = '1.08'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -82,7 +81,7 @@ def plugin_prefs(parent):
 def check_version():
     response = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
     serverVersion = response.content.strip()
-    if serverVersion != VERSION:
+    if serverVersion > VERSION:
         upgrade_callback()
 
 def upgrade_callback():
@@ -138,20 +137,15 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
+    # The ATEL Submit function can't initialize until we read the current system
+    # from an 'FSDJump' journal event.  TODO: See if EDMC exposes "system" like it does "CMDR"
+    # we set the status below to let users know the plugin is loaded. 
     this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 #############################
 # What we're really after are unique discoveries.
-#
-# TODO: Filter out "mundane" CodexEntry events for stuff like
-# Y-Type Dwarfs, HMC's, etc.
-# These will generate a CodexEntry event the first time a CMDR encounters one in a sector.
-#
-# Not an urgent fix because the data isn't entirely worthless.
-# (Black Holes, ELW's, WD/NS Herbigs, CS, are of interest.)
-
     if entry['event'] == 'CodexEntry':
         # We discovered something!
             this.cmdr = cmdr
@@ -163,9 +157,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
 
-            #Submit ATEL Button if CMDR wants to make a public discovery announcement.
-            this.status.set("Discover something interesting? \n  Click the button below to report it!")
-            nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
+            # Submit ATEL Button if CMDR wants to make a public discovery announcement.
+            # Updated wording to be more clear as to what people should be submitting.
+            this.status.set("Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
+            nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
             columnspan=2, padx=PADX, sticky=tk.W)
     else:
         # FSDJump happens often enough to clear the status window
@@ -175,14 +170,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     entry['commanderName'] = cmdr
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
-                    # Since we don't know what "name" is unless we have a
-                    # CodexEntry event, we use "Unknown Entity" as a generic
-                    # discovery type for systems with unsual or unknown phenomena
-                    this.name = 'Unknown Entity'
-
-                    #Submit ATEL Button if CMDR wants to make a public discovery announcement.
-                    this.status.set("Discover something interesting? \n  Click the button below to report it!")
-                    nb.Button(frame, text="[Transmit ATEL]", command=bulletin_callback).grid(row=10, column=0,
+                    # We use "Unscanned Phenomena" as a generic discovery type
+                    # for systems with unsual or unknown phenomena that the CMDR didn't (or couldn't) scan.
+                    this.name = 'Unscanned Phenomena'
+                    # Submit ATEL Button if CMDR wants to make a public discovery announcement.
+                    # Updated wording to be more clear as to what people should be submitting.
+                    this.status.set("Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
+                    nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
                     columnspan=2, padx=PADX, sticky=tk.W)
 
 def plugin_stop():
