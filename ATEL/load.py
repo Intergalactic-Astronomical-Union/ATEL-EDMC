@@ -58,7 +58,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.ts = time.time()
 this.jd = this.ts / 86400 + 2440587.5
-VERSION = '1.09'
+VERSION = '1.11'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -155,17 +155,18 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.system=(format(entry['System']))
             this.timestamp=(format(entry['timestamp']))
             this.population=(format(entry['Population']))
+            population = int (this.population)
             DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
             # Submit ATEL Button if CMDR wants to make a public discovery announcement.
             # Updated wording to be more clear as to what people should be submitting.
             # We don't want reports from, the bubble or populated systems, check for population value first
-            if this.population < 1000000:
+            if population < 1000000:
                 this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
                 nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
                 columnspan=2, padx=PADX, sticky=tk.W)
             else:
-                this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
+                this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE] - System Population: "+population+"")
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
@@ -175,18 +176,19 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
                     this.population=(format(entry['Population']))
+                    population = int (this.population)
                     # We use "Unscanned Phenomena" as a generic discovery type
                     # for systems with unsual or unknown phenomena that the CMDR didn't (or couldn't) scan.
                     this.name = 'Unscanned Phenomena'
                     # Submit ATEL Button if CMDR wants to make a public discovery announcement.
                     # Updated wording to be more clear as to what people should be submitting.
                     # We don't want reports from, the bubble or populated systems, check for population value first
-                    if this.population < 1000000:
+                    if population < 1000000:
                         this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
                         nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
                         columnspan=2, padx=PADX, sticky=tk.W)
                     else:
-                        this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
+                        this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE] - System Population: "+population+"")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
