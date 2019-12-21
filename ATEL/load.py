@@ -29,7 +29,7 @@
 # Special thanks to:
 #
 # Otis B. EDMC (http://edcodex.info/?m=tools&entry=150) for EDMC plugin docs
-# (DISC)Sajime and (Mobius) Odyssey for their assistance and suggestions.
+# (DISC) Sajime and (Mobius) Odyssey for their assistance and suggestions.
 #
 # The many wonderful explorers that make the Intergalactic Astronomical Union
 # [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
@@ -58,7 +58,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.ts = time.time()
 this.jd = this.ts / 86400 + 2440587.5
-VERSION = '1.08'
+VERSION = '1.09'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -154,14 +154,18 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.name=(format(entry['Name_Localised']))
             this.system=(format(entry['System']))
             this.timestamp=(format(entry['timestamp']))
+            this.population=(format(entry['Population']))
             DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
-
             # Submit ATEL Button if CMDR wants to make a public discovery announcement.
             # Updated wording to be more clear as to what people should be submitting.
-            this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
-            nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
-            columnspan=2, padx=PADX, sticky=tk.W)
+            # We don't want reports from, the bubble or populated systems, check for population value first
+            if this.population < 1000000:
+                this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
+                nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
+                columnspan=2, padx=PADX, sticky=tk.W)
+            else:
+                this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
@@ -170,14 +174,19 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     entry['commanderName'] = cmdr
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
+                    this.population=(format(entry['Population']))
                     # We use "Unscanned Phenomena" as a generic discovery type
                     # for systems with unsual or unknown phenomena that the CMDR didn't (or couldn't) scan.
                     this.name = 'Unscanned Phenomena'
                     # Submit ATEL Button if CMDR wants to make a public discovery announcement.
                     # Updated wording to be more clear as to what people should be submitting.
-                    this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
-                    nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
-                    columnspan=2, padx=PADX, sticky=tk.W)
+                    # We don't want reports from, the bubble or populated systems, check for population value first
+                    if this.population < 1000000:
+                        this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
+                        nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
+                        columnspan=2, padx=PADX, sticky=tk.W)
+                    else:
+                        this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
