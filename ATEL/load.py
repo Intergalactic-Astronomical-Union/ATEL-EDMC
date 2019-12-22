@@ -135,7 +135,7 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=255)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    this.status.set("[Event: EDMC Start] \n Waiting for Codex entry or composition scan")
+    this.status.set("ATEL-EDMC (Version "+VERSION+") Loaded \n Waiting for Codex entry or composition scan")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
@@ -149,24 +149,26 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.name=(format(entry['Name_Localised']))
             this.system=(format(entry['System']))
             this.timestamp=(format(entry['timestamp']))
-            this.population=(format(entry['Population']))
-            population = int (this.population)
             DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
             r = requests.post(url = IGAU_API, data = DATA_STR)
+            #
             # Submit ATEL Button if CMDR wants to make a public discovery announcement.
             # Updated wording to be more clear as to what people should be submitting.
-            # Also added a population check.
-            # We don't want reports from the bubble or populated systems.
-            if population < 10000:
-                this.status.set("[Event: CodexEntry - Low Pop.]\n Composition scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] \n [Submit Atel Report - Disabled]")
-                #nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
-                #columnspan=2, padx=PADX, sticky=tk.W)
-            else:
-                this.status.set("[Event: CodexEntry - High Pop.]\n Codex entry transmitted.")
+            # Also added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
+            #
+            try:
+                this.voucher=(format(entry['VoucherAmount']))
+                this.status.set("Codex entry transmitted.\n "+this.name+"\n"+"[Submit Atel Report - Disabled]")
+                #
+                # nb.button might have to be moved to its own function. Also
+                # grid(row=10, column=0, columnspan=2, padx=PADX, sticky=tk.W) may need to be on a seperate line/function
+                #
+                #nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0, columnspan=2, padx=PADX, sticky=tk.W)
+            except KeyError:
+                this.status.set("Codex entry transmitted.\n "+this.name)
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
-                # We arrived at a new system!
                     this.cmdr = cmdr
                     entry['commanderName'] = cmdr
                     this.system=(format(entry['StarSystem']))
@@ -176,7 +178,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     #
                     # need a function call or something here to remove nb.button (the submit ATEL button) if it exists.
                     #
-                    this.status.set("[Event: FSDJump]\n Waiting for Codex entry or composition scan")
+                    this.status.set("Waiting for Codex entry or composition scan")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
