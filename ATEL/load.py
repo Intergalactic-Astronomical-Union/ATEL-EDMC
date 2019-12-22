@@ -58,7 +58,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.ts = time.time()
 this.jd = this.ts / 86400 + 2440587.5
-VERSION = '1.11'
+VERSION = '1.12'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -85,7 +85,6 @@ def check_version():
         upgrade_callback()
 
 def upgrade_callback():
-
     this_fullpath = os.path.realpath(__file__)
     this_filepath, this_extension = os.path.splitext(this_fullpath)
     corrected_fullpath = this_filepath + ".py"
@@ -102,7 +101,6 @@ def upgrade_callback():
                 msginfo = ['ATEL-EDMC Upgrade has completed sucessfully.',
                            'Please close and restart EDMC']
                 tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
-
         else:
             msginfo = ['ATEL-EDMC Upgrade failed. Bad server response',
                        'Please try again']
@@ -135,12 +133,9 @@ def plugin_app(parent):
     this.parent = parent
     this.frame = tk.Frame(parent)
     this.frame.columnconfigure(2, weight=1)
-    this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=200)
+    this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=255)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    # The ATEL Submit function can't initialize until we read the current system
-    # from an 'FSDJump' journal event.  TODO: See if EDMC exposes "system" like it does "CMDR"
-    # we set the status below to let users know the plugin is loaded.
-    this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE]")
+    this.status.set("[Event: EDMC Start] \n Waiting for Codex entry or composition scan")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
@@ -160,13 +155,14 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             r = requests.post(url = IGAU_API, data = DATA_STR)
             # Submit ATEL Button if CMDR wants to make a public discovery announcement.
             # Updated wording to be more clear as to what people should be submitting.
-            # We don't want reports from, the bubble or populated systems, check for population value first
-            if population < 1000000:
-                this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
-                nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
-                columnspan=2, padx=PADX, sticky=tk.W)
+            # Also added a population check.
+            # We don't want reports from the bubble or populated systems.
+            if population < 10000:
+                this.status.set("[Event: CodexEntry - Low Pop.]\n Composition scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] \n [Submit Atel Report - Disabled]")
+                #nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
+                #columnspan=2, padx=PADX, sticky=tk.W)
             else:
-                this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE] - System Population: "+population+"")
+                this.status.set("[Event: CodexEntry - High Pop.]\n Codex entry transmitted.")
     else:
         # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
@@ -177,18 +173,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     this.timestamp=(format(entry['timestamp']))
                     this.population=(format(entry['Population']))
                     population = int (this.population)
-                    # We use "Unscanned Phenomena" as a generic discovery type
-                    # for systems with unsual or unknown phenomena that the CMDR didn't (or couldn't) scan.
-                    this.name = 'Unscanned Phenomena'
-                    # Submit ATEL Button if CMDR wants to make a public discovery announcement.
-                    # Updated wording to be more clear as to what people should be submitting.
-                    # We don't want reports from, the bubble or populated systems, check for population value first
-                    if population < 1000000:
-                        this.status.set("Comp. Scan something interesting? \n [NSP] [Bio] [Geo] [Non-Human] ")
-                        nb.Button(frame, text="[Submit ATEL Report]", command=bulletin_callback).grid(row=10, column=0,
-                        columnspan=2, padx=PADX, sticky=tk.W)
-                    else:
-                        this.status.set("ATEL-EDMC Version "+VERSION +" [ACTIVE] - System Population: "+population+"")
+                    #
+                    # need a function call or something here to remove nb.button (the submit ATEL button) if it exists.
+                    #
+                    this.status.set("[Event: FSDJump]\n Waiting for Codex entry or composition scan")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
