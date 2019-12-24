@@ -124,7 +124,7 @@ def bulletin_callback():
         'format': 'json'
     }
     ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
-    this.status.set("ATEL "+str(jd)+" Transmitted")
+    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
     # FSDJump event will clear the button.
 
@@ -161,7 +161,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
             try:
                 this.voucher=(format(entry['VoucherAmount']))
-                this.status.set("Codex discovery data sent.\n "+this.name+"")
+                this.status.set("Codex discovery data sent.\n "+this.name)
                 this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
                 retrieve(this.b1)
             except KeyError:
@@ -173,8 +173,6 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                     entry['commanderName'] = cmdr
                     this.system=(format(entry['StarSystem']))
                     this.timestamp=(format(entry['timestamp']))
-                    this.population=(format(entry['Population']))
-                    population = int (this.population)
                     this.status.set("Waiting for Codex discovery data...")
                     try:
                         forget(this.b1)
