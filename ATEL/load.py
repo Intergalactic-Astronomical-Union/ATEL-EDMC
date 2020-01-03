@@ -157,14 +157,11 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         entry['commanderName'] = cmdr
         this.name=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
-
         # embrace the JSON fad - code suggestion
         json_data = json.dumps([{"timestamp": format(entry['timestamp']), "Name_Localised": format(entry['Name_Localised']), "System": format(entry['System'])}])
-        return requests.post(url=IGAU_API, json=json_data)
-
+        r = requests.post(url = IGAU_API, json = json_data)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
-
         try:
             this.voucher=(format(entry['VoucherAmount']))
             this.status.set("Codex discovery data sent.\n "+this.name)
@@ -172,18 +169,18 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             retrieve(this.b1)
         except KeyError:
             this.status.set("Codex discovery data sent.\n "+this.name)
-        else:
-            # FSDJump happens often enough to clear the status window
-            if entry['event'] == 'FSDJump':
-                    this.cmdr = cmdr
-                    entry['commanderName'] = cmdr
-                    this.system=(format(entry['StarSystem']))
-                    this.timestamp=(format(entry['timestamp']))
+    else:
+        # FSDJump happens often enough to clear the status window
+        if entry['event'] == 'FSDJump':
+                this.cmdr = cmdr
+                entry['commanderName'] = cmdr
+                this.system=(format(entry['StarSystem']))
+                this.timestamp=(format(entry['timestamp']))
+                this.status.set("Waiting for Codex discovery data...")
+                try:
+                    forget(this.b1)
+                except AttributeError:
                     this.status.set("Waiting for Codex discovery data...")
-                    try:
-                        forget(this.b1)
-                    except AttributeError:
-                        this.status.set("Waiting for Codex discovery data...")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
