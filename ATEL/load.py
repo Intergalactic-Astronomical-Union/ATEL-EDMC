@@ -116,6 +116,7 @@ def bulletin_callback():
     # update the current time, otherwise ATEL notices will all have the same timestamp
     this.ts = time.time()
     this.jd = this.ts / 86400 + 2440587.5
+
     # Fandom wiki API needs icky JSON.
     ATEL_DATA = {
         'action': 'edit',
@@ -124,7 +125,9 @@ def bulletin_callback():
         'token': '+\\',
         'format': 'json'
     }
+
     ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
+
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
     # FSDJump event will clear the button.
@@ -147,12 +150,21 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
     if entry['event'] == 'CodexEntry':
-    # embrace the JSON fad - code suggestion
-        json_data = json.dumps([{"timestamp": format(entry['timestamp']), "cmdr": cmdr, "entry": entry['commanderName'],
-                    "name": format(entry['Name_Localised']), "system": format(entry['System'])}])
+
+        # Define variables to be passed along to submit ATEL Function
+        this.timestamp=(format(entry['timestamp']))
+        this.cmdr = cmdr
+        entry['commanderName'] = cmdr
+        this.name=(format(entry['Name_Localised']))
+        this.system=(format(entry['System']))
+
+        # embrace the JSON fad - code suggestion
+        json_data = json.dumps([{"timestamp": format(entry['timestamp']), "Name_Localised": format(entry['Name_Localised']), "System": format(entry['System'])}])
         return requests.post(url=IGAU_API, json=json_data)
+
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
+
         try:
             this.voucher=(format(entry['VoucherAmount']))
             this.status.set("Codex discovery data sent.\n "+this.name)
