@@ -29,7 +29,8 @@
 # Special thanks to:
 #
 # Otis B. EDMC (http://edcodex.info/?m=tools&entry=150) for EDMC plugin docs
-# (DISC) Sajime and (Mobius) Odyssey for their assistance and suggestions.
+# (DISC) Sajime, (Mobius) Odyssey, and (Fuel Rats) Absolver
+# for their assistance and suggestions.
 #
 # The many wonderful explorers that make the Intergalactic Astronomical Union
 # [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
@@ -56,7 +57,7 @@ import time
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
-VERSION = '1.09'
+VERSION = '1.10'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -146,28 +147,21 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
     if entry['event'] == 'CodexEntry':
-        # We discovered something!
-            # declare variables
-            this.timestamp=(format(entry['timestamp']))
-            this.cmdr = cmdr
-            entry['commanderName'] = cmdr
-            this.name=(format(entry['Name_Localised']))
-            this.system=(format(entry['System']))
-            # assemble icky JSON
-            DATA_STR = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
-            # send journal strings to database endpoint:
-            r = requests.post(url = IGAU_API, data = DATA_STR)
-            # Submit ATEL Button if CMDR wants to make a public discovery announcement.
-            # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
-            try:
-                this.voucher=(format(entry['VoucherAmount']))
-                this.status.set("Codex discovery data sent.\n "+this.name)
-                this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
-                retrieve(this.b1)
-            except KeyError:
-                this.status.set("Codex discovery data sent.\n "+this.name)
-    else:
-        # FSDJump happens often enough to clear the status window
+    # embrace the JSON fad - code suggestion
+        json_data = json.dumps([{"timestamp": format(entry['timestamp']), "cmdr": cmdr, "entry": entry['commanderName'],
+                    "name": format(entry['Name_Localised']), "system": format(entry['System'])}])
+        return requests.post(url=IGAU_API, json=json_data)
+        # Submit ATEL Button if CMDR wants to make a public discovery announcement.
+        # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
+        try:
+            this.voucher=(format(entry['VoucherAmount']))
+            this.status.set("Codex discovery data sent.\n "+this.name)
+            this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
+            retrieve(this.b1)
+        except KeyError:
+            this.status.set("Codex discovery data sent.\n "+this.name)
+        else:
+            # FSDJump happens often enough to clear the status window
             if entry['event'] == 'FSDJump':
                     this.cmdr = cmdr
                     entry['commanderName'] = cmdr
