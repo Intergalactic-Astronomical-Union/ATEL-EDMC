@@ -78,12 +78,6 @@ def plugin_prefs(parent):
     nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
-#def check_version():
-#    response = requests.get(url = github_latest_version)
-#    latest_version = response.content.strip()
-#    if latest_version > installed_version:
-#        upgrade_callback()
-
 def version_tuple(version):
    try:
       ret = tuple(map(int, version.split(".")))
@@ -102,7 +96,7 @@ def upgrade_callback():
     this_filepath, this_extension = os.path.splitext(this_fullpath)
     corrected_fullpath = this_filepath + ".py"
     try:
-        response = requests.get(IGAU_GITHUB)
+        response = requests.get(github)
         if (response.status_code == 200):
             with open(corrected_fullpath, "wb") as f:
                 f.seek(0)
