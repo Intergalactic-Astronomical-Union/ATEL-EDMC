@@ -37,14 +37,10 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import sys
 import os
-import ttk
-import Tkinter as tk
-import tkMessageBox
-from ttkHyperlinkLabel import HyperlinkLabel
 from config import applongname, appversion
-import myNotebook as nb
 import json
 import requests
 import zlib
@@ -52,17 +48,30 @@ import re
 import webbrowser
 from collections import defaultdict
 import threading
-import urllib2
+try:
+    # Python 2
+    from urllib2 import quote
+    import Tkinter as tk
+except ModuleNotFoundError:
+    # Python 3
+    from urllib.parse import quote
+    import tkinter as tk
+from ttkHyperlinkLabel import HyperlinkLabel
+import myNotebook as nb
 import time
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
-VERSION = '1.10'
+this.edsm_setting = None
+VERSION = '1.50'
 IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
 PADX = 10  # formatting
+
+def plugin_start3(plugin_dir):
+    return plugin_start()
 
 def plugin_start(plugin_dir):
     check_version()
