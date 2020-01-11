@@ -73,22 +73,22 @@ PADX = 10  # formatting
 def plugin_start3(plugin_dir):
     return plugin_start()
 
-def plugin_start(plugin_dir):
-    check_version()
+def plugin_start():
+    #check_version()
     return 'ATEL'
 
 def plugin_prefs(parent):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    CURRENT_VERSION = str(v.text)
+    CURRENT_VERSION = int(v.text)
     nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
 def check_version():
     response = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    serverVersion = response.content.strip()
+    serverVersion = int(response.content.strip())
     if serverVersion > VERSION:
         upgrade_callback()
 
