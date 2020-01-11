@@ -66,7 +66,7 @@ def plugin_start3(plugin_dir):
     return plugin_start()
 
 def plugin_start():
-    #check_version()
+    check_version()
     return 'ATEL'
 
 def plugin_prefs(parent):
