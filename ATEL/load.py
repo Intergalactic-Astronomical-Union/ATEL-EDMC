@@ -37,17 +37,10 @@
 #
 ###############################################################################
 
-from __future__ import print_function
 import sys
 import os
-from config import applongname, appversion
 import json
 import requests
-import zlib
-import re
-import webbrowser
-from collections import defaultdict
-import threading
 try:
     # Python 2
     from urllib2 import quote
@@ -56,40 +49,46 @@ except ModuleNotFoundError:
     # Python 3
     from urllib.parse import quote
     import tkinter as tk
-from ttkHyperlinkLabel import HyperlinkLabel
 import myNotebook as nb
 import time
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
-VERSION = '1.50'
-IGAU_GITHUB = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
-IGAU_GITHUB_LATEST_VERSION = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
-IGAU_API = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
-IGAU_WIKI = "https://elite-dangerous-iau.fandom.com/api.php"
+this.installed_version = '1.10'
+this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
+this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
+this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
+this.wiki = "https://elite-dangerous-iau.fandom.com/api.php"
 PADX = 10  # formatting
 
 def plugin_start3(plugin_dir):
     return plugin_start()
 
 def plugin_start():
-    #check_version()
+    check_version()
     return 'ATEL'
 
 def plugin_prefs(parent):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
-    v = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    CURRENT_VERSION = int(v.text)
-    nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=CURRENT_VERSION)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    response = requests.get(url = github_latest_version)
+    latest_version = response.content.strip()
+    nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
+def version_tuple(version):
+   try:
+      ret = tuple(map(int, version.split(".")))
+   except:
+      ret = (0,)
+   return ret
+
 def check_version():
-    response = requests.get(url = IGAU_GITHUB_LATEST_VERSION)
-    serverVersion = int(response.content.strip())
-    if serverVersion > VERSION:
+    response = requests.get(url = github_latest_version)
+    latest_version = response.content.strip()
+    if version_tuple(latest_version) > version_tuple(installed_version):
         upgrade_callback()
 
 def upgrade_callback():
@@ -97,7 +96,7 @@ def upgrade_callback():
     this_filepath, this_extension = os.path.splitext(this_fullpath)
     corrected_fullpath = this_filepath + ".py"
     try:
-        response = requests.get(IGAU_GITHUB)
+        response = requests.get(github)
         if (response.status_code == 200):
             with open(corrected_fullpath, "wb") as f:
                 f.seek(0)
