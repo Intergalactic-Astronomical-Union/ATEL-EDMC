@@ -43,16 +43,17 @@ import json
 import requests
 try:
     # Python 2
-    from urllib2 import quote
+    import urllib2
     import Tkinter as tk
     import ttk
 except ModuleNotFoundError:
     # Python 3
-    from urllib.parse import quote
+    import urllib
     import tkinter as tk
     from tkinter import ttk
 import myNotebook as nb
 import time
+
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
@@ -130,12 +131,12 @@ def bulletin_callback():
     ATEL_DATA = {
         'action': 'edit',
         'title': 'GBET '+str(jd)+': '+this.system,
-        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports '+this.name+' in system '+this.system+' via ATEL-EDMC ( Version '+VERSION+' ).'+'[[Category:' + 'GBET'+ ']]',
+        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports '+this.name+' in system '+this.system+' via ATEL-EDMC ( Version '+this.installed_version+' ).'+'[[Category:' + 'GBET'+ ']]',
         'token': '+\\',
         'format': 'json'
     }
 
-    ATEL_POST = requests.post(wiki, data=ATEL_DATA)
+    ATEL_POST = requests.post(this.wiki, data=ATEL_DATA)
 
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
@@ -166,9 +167,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         entry['commanderName'] = cmdr
         this.name=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
-        # embrace the JSON fad - code suggestion
-        json_data = json.dumps([{"timestamp": format(entry['timestamp']), "Name_Localised": format(entry['Name_Localised']), "System": format(entry['System'])}])
-        r = requests.post(url = api, json = json_data)
+        # Apparently Python 3's requests library breaks json. Not surprised.
+        # do this the old fashioned way (version 1.08) with artisinal, hand-crafted JSON BS.
+        CODEX_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
+        API_POST = requests.post(url = this.api, data = CODEX_DATA)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
         try:
@@ -178,6 +180,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             retrieve(this.b1)
         except KeyError:
             this.status.set("Codex discovery data sent.\n "+this.name)
+            print(str(this.api))
+            print(str(CODEX_DATA))
+            print(str(API_POST.request.body))
+            print(str(API_POST.text))
     else:
         # FSDJump happens often enough to clear the status window
         if entry['event'] == 'FSDJump':
