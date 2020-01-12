@@ -193,6 +193,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             #print(str(CODEX_DATA))
             #print(str(API_POST.request.body))
             #print(str(API_POST.text))
+
     else:
         # FSDJump happens often enough to clear the status window
         if entry['event'] == 'FSDJump':
