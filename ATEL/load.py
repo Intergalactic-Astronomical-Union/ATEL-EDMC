@@ -45,17 +45,19 @@ try:
     # Python 2
     from urllib2 import quote
     import Tkinter as tk
+    import ttk
 except ModuleNotFoundError:
     # Python 3
     from urllib.parse import quote
     import tkinter as tk
+    from tkinter import ttk
 import myNotebook as nb
 import time
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
-this.installed_version = '1.10'
+this.installed_version = '1.50'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -69,13 +71,12 @@ def plugin_start():
     check_version()
     return 'ATEL'
 
-def plugin_prefs(parent):
+def plugin_prefs(parent, cmdr, is_beta):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     response = requests.get(url = github_latest_version)
     latest_version = response.content.strip()
     nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
 def version_tuple(version):
@@ -134,7 +135,7 @@ def bulletin_callback():
         'format': 'json'
     }
 
-    ATEL_POST = requests.post(IGAU_WIKI, data=ATEL_DATA)
+    ATEL_POST = requests.post(wiki, data=ATEL_DATA)
 
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
@@ -167,7 +168,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.system=(format(entry['System']))
         # embrace the JSON fad - code suggestion
         json_data = json.dumps([{"timestamp": format(entry['timestamp']), "Name_Localised": format(entry['Name_Localised']), "System": format(entry['System'])}])
-        r = requests.post(url = IGAU_API, json = json_data)
+        r = requests.post(url = api, json = json_data)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
         try:
