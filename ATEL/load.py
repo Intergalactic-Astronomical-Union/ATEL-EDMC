@@ -45,10 +45,12 @@ try:
     # Python 2
     from urllib2 import quote
     import Tkinter as tk
+    import ttk
 except ModuleNotFoundError:
     # Python 3
     from urllib.parse import quote
     import tkinter as tk
+    from tkinter import ttk
 import myNotebook as nb
 import time
 
@@ -69,13 +71,12 @@ def plugin_start():
     check_version()
     return 'ATEL'
 
-def plugin_prefs(parent):
+def plugin_prefs(parent, cmdr, is_beta):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     response = requests.get(url = github_latest_version)
     latest_version = response.content.strip()
     nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Label(frame, text="Latest ATEL-EDMC version: {CURRENT_VERSION}".format(CURRENT_VERSION=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     return frame
 
 def version_tuple(version):
