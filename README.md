@@ -7,6 +7,7 @@ A simple EDMC plugin to automatically collect codex discovery information and (o
 Installation instructions:
 
 (Version 1.1x (Python2) Requires EDMC 3.4.3 https://github.com/Marginal/EDMarketConnector/releases/tag/rel-343 )
+
 (Version 1.5x (Python3) Requires EDMC 3.5.x https://github.com/Marginal/EDMarketConnector/releases/tag/rel-350-0 )
 
 Open EDMC
