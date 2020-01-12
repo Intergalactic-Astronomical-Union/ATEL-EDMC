@@ -130,7 +130,7 @@ def bulletin_callback():
     ATEL_DATA = {
         'action': 'edit',
         'title': 'GBET '+str(jd)+': '+this.system,
-        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports '+this.name+' in system '+this.system+' via ATEL-EDMC ( Version '+VERSION+' ).'+'[[Category:' + 'GBET'+ ']]',
+        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports '+this.name+' in system '+this.system+' via ATEL-EDMC ( Version '+this.installed_version+' ).'+'[[Category:' + 'GBET'+ ']]',
         'token': '+\\',
         'format': 'json'
     }
