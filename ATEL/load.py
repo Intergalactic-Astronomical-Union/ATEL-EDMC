@@ -60,7 +60,7 @@ import time
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
-this.installed_version = '1.21'
+this.installed_version = '1.22'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -80,7 +80,8 @@ def plugin_prefs(parent, cmdr, is_beta):
     response = requests.get(url = this.github_latest_version)
     latest_version = response.content.strip()
     nb.Label(frame, text="ATEL-EDMC {INSTALLED}\n".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    # disabled until EDMC Verion 3.5 General Release since Python 2 and 3 handle some strings differently. 
+        nb.Button(frame, text="Check for updated version", command=upgrade_callback).grid(row=10, column=0, columnspan=2, padx=PADX, sticky=tk.W)
+    # disabled until EDMC Verion 3.5 General Release since Python 2 and 3 handle some strings differently.
     #nb.Label(frame, text="ATEL-EDMC {LATEST}\n".format(LATEST=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='Discord', background=nb.Label().cget('background'), url='https://discord.gg/2Qq37xt\n', underline=True).grid(padx=PADX, sticky=tk.W)
