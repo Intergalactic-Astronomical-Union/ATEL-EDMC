@@ -47,14 +47,12 @@ try:
     import Tkinter as tk
     import ttk
     from ttkHyperlinkLabel import HyperlinkLabel
-    import tkMessageBox
 except ModuleNotFoundError:
     # Python 3
     import urllib
     import tkinter as tk
     from tkinter import ttk
     from ttkHyperlinkLabel import HyperlinkLabel
-    import tkMessageBox
 import myNotebook as nb
 import time
 
@@ -72,7 +70,6 @@ def plugin_start3(plugin_dir):
     return plugin_start()
 
 def plugin_start():
-    check_version()
     return 'ATEL'
 
 def plugin_prefs(parent, cmdr, is_beta):
