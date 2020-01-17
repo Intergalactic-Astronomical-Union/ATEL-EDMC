@@ -47,12 +47,14 @@ try:
     import Tkinter as tk
     import ttk
     from ttkHyperlinkLabel import HyperlinkLabel
+    import tkMessageBox
 except ModuleNotFoundError:
     # Python 3
     import urllib
     import tkinter as tk
     from tkinter import ttk
     from ttkHyperlinkLabel import HyperlinkLabel
+    import tkMessageBox
 import myNotebook as nb
 import time
 
@@ -60,8 +62,7 @@ import time
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
-this.installed_version = '1.22'
-this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
+this.installed_version = '1.23'
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 this.wiki = "https://elite-dangerous-iau.fandom.com/api.php"
@@ -80,52 +81,10 @@ def plugin_prefs(parent, cmdr, is_beta):
     response = requests.get(url = this.github_latest_version)
     latest_version = response.content.strip()
     nb.Label(frame, text="ATEL-EDMC {INSTALLED}\n".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    nb.Button(frame, text="Check for updated version", command=upgrade_callback).grid(row=10, column=0, columnspan=2, padx=PADX, sticky=tk.W)
-    # disabled until EDMC Verion 3.5 General Release since Python 2 and 3 handle some strings differently.
-    #nb.Label(frame, text="ATEL-EDMC {LATEST}\n".format(LATEST=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='Discord', background=nb.Label().cget('background'), url='https://discord.gg/2Qq37xt\n', underline=True).grid(padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='Wiki', background=nb.Label().cget('background'), url='https://elite-dangerous-iau.fandom.com\n', underline=True).grid(padx=PADX, sticky=tk.W)
     return frame
-
-def version_tuple(version):
-   try:
-      ret = tuple(map(int, version.split(".")))
-   except:
-      ret = (0,)
-   return ret
-
-def check_version():
-    response = requests.get(url = this.github_latest_version)
-    latest_version = response.content.strip()
-    if version_tuple(latest_version) > version_tuple(installed_version):
-        upgrade_callback()
-
-def upgrade_callback():
-    this_fullpath = os.path.realpath(__file__)
-    this_filepath, this_extension = os.path.splitext(this_fullpath)
-    corrected_fullpath = this_filepath + ".py"
-    try:
-        response = requests.get(github)
-        if (response.status_code == 200):
-            with open(corrected_fullpath, "wb") as f:
-                f.seek(0)
-                f.write(response.content)
-                f.truncate()
-                f.flush()
-                os.fsync(f.fileno())
-                this.upgrade_applied = True  # Latch on upgrade successful
-                msginfo = ['ATEL-EDMC Upgrade has completed sucessfully.',
-                           'Please close and restart EDMC']
-                tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
-        else:
-            msginfo = ['ATEL-EDMC Upgrade failed. Bad server response',
-                       'Please try again']
-            tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
-    except:
-        msginfo = ['ATEL-EDMC Upgrade encountered a problem.',
-                   'Please try again, and restart if problems persist']
-        tkMessageBox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def dashboard_entry(cmdr, is_beta, entry):
     this.cmdr = cmdr
