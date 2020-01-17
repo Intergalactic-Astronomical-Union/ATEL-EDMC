@@ -80,7 +80,7 @@ def plugin_prefs(parent, cmdr, is_beta):
     response = requests.get(url = this.github_latest_version)
     latest_version = response.content.strip()
     nb.Label(frame, text="ATEL-EDMC {INSTALLED}\n".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-        nb.Button(frame, text="Check for updated version", command=upgrade_callback).grid(row=10, column=0, columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Button(frame, text="Check for updated version", command=upgrade_callback).grid(row=10, column=0, columnspan=2, padx=PADX, sticky=tk.W)
     # disabled until EDMC Verion 3.5 General Release since Python 2 and 3 handle some strings differently.
     #nb.Label(frame, text="ATEL-EDMC {LATEST}\n".format(LATEST=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
