@@ -46,11 +46,13 @@ try:
     import urllib2
     import Tkinter as tk
     import ttk
+    from ttkHyperlinkLabel import HyperlinkLabel
 except ModuleNotFoundError:
     # Python 3
     import urllib
     import tkinter as tk
     from tkinter import ttk
+    from ttkHyperlinkLabel import HyperlinkLabel
 import myNotebook as nb
 import time
 
@@ -58,7 +60,7 @@ import time
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
-this.installed_version = '1.20'
+this.installed_version = '1.21'
 this.github = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -77,7 +79,12 @@ def plugin_prefs(parent, cmdr, is_beta):
     frame.columnconfigure(5, weight=1)
     response = requests.get(url = this.github_latest_version)
     latest_version = response.content.strip()
-    nb.Label(frame, text="ATEL-EDMC {VER}".format(VER=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Label(frame, text="ATEL-EDMC {INSTALLED}\n".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    # disabled until EDMC Verion 3.5 General Release since Python 2 and 3 handle some strings differently. 
+    #nb.Label(frame, text="ATEL-EDMC {LATEST}\n".format(LATEST=latest_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='Discord', background=nb.Label().cget('background'), url='https://discord.gg/2Qq37xt\n', underline=True).grid(padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='Wiki', background=nb.Label().cget('background'), url='https://elite-dangerous-iau.fandom.com\n', underline=True).grid(padx=PADX, sticky=tk.W)
     return frame
 
 def version_tuple(version):
@@ -140,10 +147,10 @@ def bulletin_callback():
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # The print statements below can be uncommented to debug data transmission issues.
     # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-    #print(str(this.wiki))
-    #print(str(ATEL_DATA))
-    #print(str(ATEL_POST.request.body))
-    #print(str(ATEL_POST.text))
+    print(str(this.wiki))
+    print(str(ATEL_DATA))
+    print(str(ATEL_POST.request.body))
+    print(str(ATEL_POST.text))
 
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
     # FSDJump event will clear the button.
@@ -179,7 +186,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         API_POST = requests.post(url = this.api, data = CODEX_DATA)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
-        # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc. 
+        # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc.
         try:
             this.voucher=(format(entry['VoucherAmount']))
             this.status.set("Codex discovery data sent.\n "+this.name)
@@ -189,10 +196,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.status.set("Codex discovery data sent.\n "+this.name)
             # The print statements below can be uncommented to debug data transmission issues.
             # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-            #print(str(this.api))
-            #print(str(CODEX_DATA))
-            #print(str(API_POST.request.body))
-            #print(str(API_POST.text))
+            print(str(this.api))
+            print(str(CODEX_DATA))
+            print(str(API_POST.request.body))
+            print(str(API_POST.text))
 
     else:
         # FSDJump happens often enough to clear the status window
