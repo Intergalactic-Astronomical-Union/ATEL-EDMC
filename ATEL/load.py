@@ -104,11 +104,10 @@ def bulletin_callback():
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # The print statements below can be uncommented to debug data transmission issues.
     # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-    print(str(this.wiki))
-    print(str(ATEL_DATA))
-    print(str(ATEL_POST.request.body))
-    print(str(ATEL_POST.text))
-
+    #print(str(this.wiki))
+    #print(str(ATEL_DATA))
+    #print(str(ATEL_POST.request.body))
+    #print(str(ATEL_POST.text))
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
     # FSDJump event will clear the button.
 
@@ -153,10 +152,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.status.set("Codex discovery data sent.\n "+this.name)
             # The print statements below can be uncommented to debug data transmission issues.
             # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-            print(str(this.api))
-            print(str(CODEX_DATA))
-            print(str(API_POST.request.body))
-            print(str(API_POST.text))
+            #print(str(this.api))
+            #print(str(CODEX_DATA))
+            #print(str(API_POST.request.body))
+            #print(str(API_POST.text))
 
     else:
         # FSDJump happens often enough to clear the status window
