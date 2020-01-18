@@ -1,8 +1,8 @@
 A simple EDMC plugin to automatically collect codex discovery information and (optionally) transmit Astronomical "telegram" style discovery notices for publication by the Intergalactic Astronomical Union. 
 
-(https://elite-dangerous-iau.fandom.com/wiki/Data_Catalog)
+(https://github.com/Elite-IGAU/publications/blob/master/IGAU_Codex.csv)
 
-(https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams)
+(https://elite-dangerous-iau.fandom.com/wiki/Category:GBET)
 
 Installation instructions:
 
