@@ -66,7 +66,7 @@ def plugin_prefs(parent, cmdr, is_beta):
     nb.Label(frame, text="Latest ATEL-EDMC version: {latest_version_str}".format(latest_version_str=latest_version_str)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='Discord', background=nb.Label().cget('background'), url='https://discord.gg/2Qq37xt\n', underline=True).grid(padx=PADX, sticky=tk.W)
-    HyperlinkLabel(frame, text='Wiki', background=nb.Label().cget('background'), url='https://elite-dangerous-iau.fandom.com\n', underline=True).grid(padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='Web', background=nb.Label().cget('background'), url='https://elite-igau.github.io/\n', underline=True).grid(padx=PADX, sticky=tk.W)
     return frame
 
 def check_version():
