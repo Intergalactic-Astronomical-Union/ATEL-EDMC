@@ -45,6 +45,7 @@ import time
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
+this.app_name = 'ATEL-EDMC'
 this.installed_version = 1.29
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
@@ -112,18 +113,18 @@ def bulletin_callback():
     # update the current time, otherwise ATEL notices will all have the same timestamp
     this.ts = time.time()
     this.jd = this.ts / 86400 + 2440587.5
-    #this.jd_str = str(jd)
+    this.jd_str = str(jd)
 
+    # Have to make the data string a little different than CODEX_DATA below.
+    ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
     ATEL_POST = requests.post(this.atel, data=ATEL_DATA)
-    ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}"}}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'], entry['app_name'], entry['installed_version'], entry['cmdr'], entry['jd_str'])
-    this.status.set("TEST ATEL "+str(jd)+" Logged \n ")
-    #this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
+    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # The print statements below can be uncommented to debug data transmission issues.
     # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-    print(str(this.atel))
-    print(str(ATEL_DATA))
-    print(str(ATEL_POST.request.body))
-    print(str(ATEL_POST.text))
+    #print(str(this.atel))
+    #print(str(ATEL_DATA))
+    #print(str(ATEL_POST.request.body))
+    #print(str(ATEL_POST.text))
     # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
     # FSDJump event will clear the button.
 
@@ -160,17 +161,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
         # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc.
 
-        # enabling ATEL button for testing purposes
-        this.b1 = nb.Button(frame, text="[Submit TEST ATEL]", command=bulletin_callback)
-        retrieve(this.b1)
-
-        #try:
-        #    this.voucher=(format(entry['VoucherAmount']))
-        #    this.status.set("Codex discovery data sent.\n "+this.name)
-        #    this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
-        #    retrieve(this.b1)
-        #except KeyError:
-        #    this.status.set("Codex discovery data sent.\n "+this.name)
+        try:
+            this.voucher=(format(entry['VoucherAmount']))
+            this.status.set("Codex discovery data sent.\n "+this.name)
+            this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
+            retrieve(this.b1)
+        except KeyError:
+            this.status.set("Codex discovery data sent.\n "+this.name)
             # The print statements below can be uncommented to debug data transmission issues.
             # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
             #print(str(this.api))
