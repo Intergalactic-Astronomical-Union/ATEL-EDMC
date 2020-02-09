@@ -2,7 +2,7 @@ A simple EDMC plugin to automatically collect codex discovery information and (o
 
 (https://github.com/Elite-IGAU/publications/blob/master/IGAU_Codex.csv)
 
-(https://elite-dangerous-iau.fandom.com/wiki/Category:GBET)
+(https://github.com/Elite-IGAU/publications/tree/master/ATEL)
 
 Installation instructions:
 
