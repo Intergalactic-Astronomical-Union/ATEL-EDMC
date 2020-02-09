@@ -7,6 +7,7 @@ A simple EDMC plugin to automatically collect codex discovery information and (o
 Installation instructions:
 
 Grab the latest release here: https://github.com/Elite-IGAU/ATEL-EDMC/releases
+
 **(Version 1.2x for EDMC 3.4x, Version 1.3x for EDMC 3.5x)**
 
 Open EDMC
