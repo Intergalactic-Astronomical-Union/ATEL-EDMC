@@ -46,7 +46,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.30
+this.installed_version = 1.31
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -151,11 +151,14 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.timestamp=(format(entry['timestamp']))
         this.cmdr = cmdr
         entry['commanderName'] = cmdr
+        this.entryid=(format(entry['EntryID']))
+        this.name_raw=(format(entry['Name']))
         this.name=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
+        this.systemaddress=(format(entry['SystemAddress']))
         # Apparently Python 3's requests library breaks json. Not surprised.
         # do this the old fashioned way (version 1.08) with artisinal, hand-crafted JSON BS.
-        CODEX_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
+        CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}" }}'.format(entry['timestamp'], entry['EntryID'], entry['Name'], entry['Name_Localised'], entry['System'],entry['SystemAddress'])
         API_POST = requests.post(url = this.api, data = CODEX_DATA)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
