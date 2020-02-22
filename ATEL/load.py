@@ -153,12 +153,14 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         entry['commanderName'] = cmdr
         this.entryid=(format(entry['EntryID']))
         this.name_raw=(format(entry['Name']))
+        this.name_stripped=(re.sub(";|\$", "", this.name_raw))
+        this.name_lower = str.lower(this.name_stripped)
         this.name=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
         this.systemaddress=(format(entry['SystemAddress']))
         # Apparently Python 3's requests library breaks json. Not surprised.
         # do this the old fashioned way (version 1.08) with artisinal, hand-crafted JSON BS.
-        CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}" }}'.format(entry['timestamp'], entry['EntryID'], entry['Name'], entry['Name_Localised'], entry['System'],entry['SystemAddress'])
+        CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}" }}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'])
         API_POST = requests.post(url = this.api, data = CODEX_DATA)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
