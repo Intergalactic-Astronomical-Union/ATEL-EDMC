@@ -41,6 +41,7 @@ from ttkHyperlinkLabel import HyperlinkLabel
 from tkinter import messagebox
 import myNotebook as nb
 import time
+import re
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
@@ -114,9 +115,8 @@ def bulletin_callback():
     this.ts = time.time()
     this.jd = this.ts / 86400 + 2440587.5
     this.jd_str = str(jd)
-
     # Have to make the data string a little different than CODEX_DATA below.
-    ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
+    ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name_localised, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
     ATEL_POST = requests.post(this.atel, data=ATEL_DATA)
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
     # The print statements below can be uncommented to debug data transmission issues.
@@ -146,16 +146,15 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
     if entry['event'] == 'CodexEntry':
-
         # Define variables to be passed along to submit ATEL Function
         this.timestamp=(format(entry['timestamp']))
         this.cmdr = cmdr
         entry['commanderName'] = cmdr
         this.entryid=(format(entry['EntryID']))
-        this.name_raw=(format(entry['Name']))
-        this.name_stripped=(re.sub(";|\$", "", this.name_raw))
+        this.name=(format(entry['Name']))
+        this.name_stripped=(re.sub(";|\$", "", this.name))
         this.name_lower = str.lower(this.name_stripped)
-        this.name=(format(entry['Name_Localised']))
+        this.name_localised=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
         this.systemaddress=(format(entry['SystemAddress']))
         # Apparently Python 3's requests library breaks json. Not surprised.
@@ -165,7 +164,6 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
         # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc.
-
         try:
             this.voucher=(format(entry['VoucherAmount']))
             this.status.set("Codex discovery data sent.\n "+this.name)
@@ -179,7 +177,6 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             #print(str(CODEX_DATA))
             #print(str(API_POST.request.body))
             #print(str(API_POST.text))
-
     else:
         # FSDJump happens often enough to clear the status window
         if entry['event'] == 'FSDJump':
