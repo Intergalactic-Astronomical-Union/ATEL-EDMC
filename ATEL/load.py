@@ -118,7 +118,7 @@ def bulletin_callback():
     # Have to make the data string a little different than CODEX_DATA below.
     ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name_localised, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
     ATEL_POST = requests.post(this.atel, data=ATEL_DATA)
-    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
+    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name_localised)
     # The print statements below can be uncommented to debug data transmission issues.
     # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
     #print(str(this.atel))
@@ -152,7 +152,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         entry['commanderName'] = cmdr
         this.entryid=(format(entry['EntryID']))
         this.name=(format(entry['Name']))
-        this.name_stripped=(re.sub(";|\$", "", this.name))
+        this.name_stripped=(re.sub(";|\$|_Name", "", this.name))
         this.name_lower = str.lower(this.name_stripped)
         this.name_localised=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
@@ -166,11 +166,11 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc.
         try:
             this.voucher=(format(entry['VoucherAmount']))
-            this.status.set("Codex discovery data sent.\n "+this.name)
+            this.status.set("Codex discovery data sent.\n "+this.name_localised)
             this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
             retrieve(this.b1)
         except KeyError:
-            this.status.set("Codex discovery data sent.\n "+this.name)
+            this.status.set("Codex discovery data sent.\n "+this.name_localised)
             # The print statements below can be uncommented to debug data transmission issues.
             # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
             #print(str(this.api))
