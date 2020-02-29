@@ -3,25 +3,18 @@
 # CMDR journal to the Intergalactic Astronomical Union for record keeping,
 # and scientific purposes.
 #
-# Discoveries DO NOT have CMDR data attached to them unless a CMDR chooses to
-# submit a public Astronomical Telegram - a short "postcard" style anouncement
-# to immediately announce UNIQUE discoveries which are automatically
-# sent to IGAU by this plugin.
+# CMDR's may also (optionally) submit a public Astronomical Telegram
+# Short "postcard" style anouncements used to immediately (and publicly)
+# announce UNIQUE discoveries.
 #
 # ATEL notices are available at:
-# https://elite-dangerous-iau.fandom.com/wiki/Galactic_Bureau_for_Astronomical_Telegrams
+# https://github.com/Elite-IGAU/publications/tree/master/ATEL
 #
 # Data Catalog available at:
 # https://raw.githubusercontent.com/Elite-IGAU/publications/master/IGAU_Codex.csv
 #
 # Source Code availble for review at:
 # https://github.com/Elite-IGAU/ATEL-EDMC
-#
-# DATA COLLECTION NOTICE:
-# IGAU only stores the following data:
-# discovery date/time, discovery name, and discovery location.
-# IGAU does NOT store any "Personally Identifiable Information" (PII) in our
-# public discovery catalog.
 #
 # Please submit bug reports or issues at:
 # https://github.com/Elite-IGAU/ATEL-EDMC/issues
@@ -41,47 +34,78 @@ import sys
 import os
 import json
 import requests
-try:
-    # Python 2
-    import urllib2
-    import Tkinter as tk
-    import ttk
-    from ttkHyperlinkLabel import HyperlinkLabel
-except ModuleNotFoundError:
-    # Python 3
-    import urllib
-    import tkinter as tk
-    from tkinter import ttk
-    from ttkHyperlinkLabel import HyperlinkLabel
+import urllib
+import tkinter as tk
+from tkinter import ttk
+from ttkHyperlinkLabel import HyperlinkLabel
+from tkinter import messagebox
 import myNotebook as nb
 import time
-
+import re
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
-this.installed_version = '1.23'
+this.app_name = 'ATEL-EDMC'
+this.installed_version = 1.31
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
+this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
-this.wiki = "https://elite-dangerous-iau.fandom.com/api.php"
+this.atel = "https://01ixzg9ifh.execute-api.us-west-1.amazonaws.com/Prod"
 PADX = 10  # formatting
 
 def plugin_start3(plugin_dir):
-    return plugin_start()
-
-def plugin_start():
+    check_version()
     return 'ATEL'
 
 def plugin_prefs(parent, cmdr, is_beta):
     frame = nb.Frame(parent)
     frame.columnconfigure(5, weight=1)
     response = requests.get(url = this.github_latest_version)
-    latest_version = response.content.strip()
-    nb.Label(frame, text="ATEL-EDMC {INSTALLED}\n".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    this.latest_version = float(response.content.strip().decode('utf-8'))
+    this.latest_version_str = str(this.latest_version)
+    nb.Label(frame, text="ATEL-EDMC {INSTALLED}".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
+    nb.Label(frame, text="Latest ATEL-EDMC version: {latest_version_str}".format(latest_version_str=latest_version_str)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='Discord', background=nb.Label().cget('background'), url='https://discord.gg/2Qq37xt\n', underline=True).grid(padx=PADX, sticky=tk.W)
-    HyperlinkLabel(frame, text='Wiki', background=nb.Label().cget('background'), url='https://elite-dangerous-iau.fandom.com\n', underline=True).grid(padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='Web', background=nb.Label().cget('background'), url='https://elite-igau.github.io/\n', underline=True).grid(padx=PADX, sticky=tk.W)
     return frame
+
+def check_version():
+    response = requests.get(url = this.github_latest_version)
+    this.latest_version = float(response.content.strip().decode('utf-8'))
+    this.latest_version_str = str(this.latest_version)
+    if this.latest_version > this.installed_version:
+        upgrade_callback()
+
+def upgrade_callback():
+    this_fullpath = os.path.realpath(__file__)
+    this_filepath, this_extension = os.path.splitext(this_fullpath)
+    corrected_fullpath = this_filepath + ".py"
+    try:
+        response = requests.get(this.plugin_source)
+        if (response.status_code == 200):
+            with open(corrected_fullpath, "wb") as f:
+                f.seek(0)
+                f.write(response.content)
+                f.truncate()
+                f.flush()
+                os.fsync(f.fileno())
+                this.upgrade_applied = True  # Latch on upgrade successful
+                msginfo = ['ATEL-EDMC Upgrade '+this.latest_version_str+' has completed sucessfully.',
+                           'Please close and restart EDMC']
+                messagebox.showinfo("Upgrade status", "\n".join(msginfo))
+            sys.stderr.write("Finished ATEL-EDMC upgrade!\n")
+
+        else:
+            msginfo = ['ATEL-EDMC Upgrade failed. Bad server response',
+            'Please try again']
+            messagebox.showinfo("Upgrade status", "\n".join(msginfo))
+    except:
+        this.upgrade_applied = True  # Latch on upgrade successful
+        msginfo = ['ATEL-EDMC Upgrade '+this.latest_version_str+' has completed sucessfully.',
+                   'Please close and restart EDMC']
+        messagebox.showinfo("Upgrade status", "\n".join(msginfo))
 
 def dashboard_entry(cmdr, is_beta, entry):
     this.cmdr = cmdr
@@ -90,21 +114,14 @@ def bulletin_callback():
     # update the current time, otherwise ATEL notices will all have the same timestamp
     this.ts = time.time()
     this.jd = this.ts / 86400 + 2440587.5
-
-    # Fandom wiki API needs icky JSON.
-    ATEL_DATA = {
-        'action': 'edit',
-        'title': 'GBET '+str(jd)+': '+this.system,
-        'text': 'At time index: '+this.timestamp+', '+this.cmdr+' reports '+this.name+' in system '+this.system+' via ATEL-EDMC ( Version '+this.installed_version+' ).'+'[[Category:' + 'GBET'+ ']]',
-        'token': '+\\',
-        'format': 'json'
-    }
-
-    ATEL_POST = requests.post(this.wiki, data=ATEL_DATA)
-    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name)
+    this.jd_str = str(jd)
+    # Have to make the data string a little different than CODEX_DATA below.
+    ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name_localised, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
+    ATEL_POST = requests.post(this.atel, data=ATEL_DATA)
+    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name_localised)
     # The print statements below can be uncommented to debug data transmission issues.
     # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-    #print(str(this.wiki))
+    #print(str(this.atel))
     #print(str(ATEL_DATA))
     #print(str(ATEL_POST.request.body))
     #print(str(ATEL_POST.text))
@@ -129,34 +146,37 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
     if entry['event'] == 'CodexEntry':
-
         # Define variables to be passed along to submit ATEL Function
         this.timestamp=(format(entry['timestamp']))
         this.cmdr = cmdr
         entry['commanderName'] = cmdr
-        this.name=(format(entry['Name_Localised']))
+        this.entryid=(format(entry['EntryID']))
+        this.name=(format(entry['Name']))
+        this.name_stripped=(re.sub(";|\$|_Name", "", this.name))
+        this.name_lower = str.lower(this.name_stripped)
+        this.name_localised=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
+        this.systemaddress=(format(entry['SystemAddress']))
         # Apparently Python 3's requests library breaks json. Not surprised.
         # do this the old fashioned way (version 1.08) with artisinal, hand-crafted JSON BS.
-        CODEX_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}" }}'.format(entry['timestamp'], entry['Name_Localised'], entry['System'])
+        CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = CODEX_DATA)
         # Submit ATEL Button if CMDR wants to make a public discovery announcement.
         # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
         # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc.
         try:
             this.voucher=(format(entry['VoucherAmount']))
-            this.status.set("Codex discovery data sent.\n "+this.name)
+            this.status.set("Codex discovery data sent.\n "+this.name_localised)
             this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
             retrieve(this.b1)
         except KeyError:
-            this.status.set("Codex discovery data sent.\n "+this.name)
+            this.status.set("Codex discovery data sent.\n "+this.name_localised)
             # The print statements below can be uncommented to debug data transmission issues.
             # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
             #print(str(this.api))
             #print(str(CODEX_DATA))
             #print(str(API_POST.request.body))
             #print(str(API_POST.text))
-
     else:
         # FSDJump happens often enough to clear the status window
         if entry['event'] == 'FSDJump':
