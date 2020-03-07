@@ -47,7 +47,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.31
+this.installed_version = 1.32
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -157,19 +157,11 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.name_localised=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
         this.systemaddress=(format(entry['SystemAddress']))
-        # Apparently Python 3's requests library breaks json. Not surprised.
-        # do this the old fashioned way (version 1.08) with artisinal, hand-crafted JSON BS.
-        CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
-        API_POST = requests.post(url = this.api, data = CODEX_DATA)
-        # Submit ATEL Button if CMDR wants to make a public discovery announcement.
-        # Added a value check - unless a CodexEntry event generates a Voucher from a composition scan, we don't offer the report button.
-        # This prevents ATEL reports for "mundane" discoveries like standard gas giants, non-terraformables, brown dwarfs, etc.
+
         try:
             this.voucher=(format(entry['VoucherAmount']))
-            this.status.set("Codex discovery data sent.\n "+this.name_localised)
-            this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
-            retrieve(this.b1)
-        except KeyError:
+            CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
+            API_POST = requests.post(url = this.api, data = CODEX_DATA)
             this.status.set("Codex discovery data sent.\n "+this.name_localised)
             # The print statements below can be uncommented to debug data transmission issues.
             # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
@@ -177,6 +169,11 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             #print(str(CODEX_DATA))
             #print(str(API_POST.request.body))
             #print(str(API_POST.text))
+            this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
+            retrieve(this.b1)
+        except KeyError:
+            this.status.set("Waiting for Codex discovery data...")
+
     else:
         # FSDJump happens often enough to clear the status window
         if entry['event'] == 'FSDJump':
