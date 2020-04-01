@@ -7,7 +7,7 @@ A simple EDMC plugin to automatically collect codex discovery information and (o
 
 Installation instructions:
 
-Grab the latest release here: https://github.com/Elite-IGAU/ATEL-EDMC/releases
+Grab the latest release here: https://github.com/Elite-IGAU/ATEL-EDMC/releases/tag/latest
 
 **(Version 1.2x for EDMC 3.4x, Version 1.3x for EDMC 3.5x)**
 
@@ -17,6 +17,6 @@ Click File -> Settings -> [Plugins]
 
 Click [Open] next to the Plugins folder listing.
 
-Unpack the .zip file into the plugins folder.
+Download the source zip file, unzip it, then copy the "ATEL" folder to the plugins folder.
 
 Restart EDMC
