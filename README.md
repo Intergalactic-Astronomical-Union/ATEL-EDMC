@@ -10,9 +10,9 @@ Installation instructions:
 
 - Grab the latest release(s) here:
 
-**(Version 1.2x (1.2 branch) for EDMC 3.4x: https://github.com/Elite-IGAU/ATEL-EDMC/releases/tag/1.29** 
+**Version 1.2x (1.2 branch) for EDMC 3.4x: https://github.com/Elite-IGAU/ATEL-EDMC/releases/tag/1.29** 
 
-**Version 1.3x (master branch) for EDMC 3.5x): https://github.com/Elite-IGAU/ATEL-EDMC/releases/tag/1.32**
+**Version 1.3x (master branch) for EDMC 3.5x: https://github.com/Elite-IGAU/ATEL-EDMC/releases/tag/1.32**
 
 - Open EDMC
 
