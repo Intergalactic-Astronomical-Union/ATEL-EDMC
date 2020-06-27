@@ -13,17 +13,12 @@
 # Data Catalog available at:
 # https://raw.githubusercontent.com/Elite-IGAU/publications/master/IGAU_Codex.csv
 #
-# Source Code availble for review at:
-# https://github.com/Elite-IGAU/ATEL-EDMC
-#
 # Please submit bug reports or issues at:
 # https://github.com/Elite-IGAU/ATEL-EDMC/issues
 #
 # Special thanks to:
 #
-# Otis B. EDMC (http://edcodex.info/?m=tools&entry=150) for EDMC plugin docs
-# (DISC) Sajime, (Mobius) Odyssey, (Fuel Rats) Absolver, and the entire EDCD
-# community for assistance, suggestions, and testing.
+# The entire EDCD community for assistance, suggestions, and testing.
 #
 # The many wonderful explorers that make the Intergalactic Astronomical Union
 # [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
@@ -47,7 +42,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.32
+this.installed_version = 1.33
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -119,14 +114,6 @@ def bulletin_callback():
     ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name_localised, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
     ATEL_POST = requests.post(this.atel, data=ATEL_DATA)
     this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name_localised)
-    # The print statements below can be uncommented to debug data transmission issues.
-    # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-    #print(str(this.atel))
-    #print(str(ATEL_DATA))
-    #print(str(ATEL_POST.request.body))
-    #print(str(ATEL_POST.text))
-    # We don't issue forget(this.b1) in case there are multiple CodexEvents to report.
-    # FSDJump event will clear the button.
 
 def forget(widget):
     widget.grid_forget()
@@ -140,7 +127,7 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=255)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    this.status.set("Waiting for Codex discovery data...")
+    this.status.set("Waiting for Codex data...")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
@@ -163,16 +150,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
             API_POST = requests.post(url = this.api, data = CODEX_DATA)
             this.status.set("Codex discovery data sent.\n "+this.name_localised)
-            # The print statements below can be uncommented to debug data transmission issues.
-            # Log file located at: \user_name\AppData\Local\Temp\EDMarketConnector.log
-            #print(str(this.api))
-            #print(str(CODEX_DATA))
-            #print(str(API_POST.request.body))
-            #print(str(API_POST.text))
             this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
             retrieve(this.b1)
         except KeyError:
-            this.status.set("Waiting for Codex discovery data...")
+            this.status.set("Waiting for Codex data...")
 
     else:
         # FSDJump happens often enough to clear the status window
@@ -185,7 +166,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                 try:
                     forget(this.b1)
                 except AttributeError:
-                    this.status.set("Waiting for Codex discovery data...")
+                    this.status.set("Waiting for Codex data...")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
