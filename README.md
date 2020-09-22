@@ -1,4 +1,4 @@
-A simple EDMC plugin to automatically collect codex discovery information and (optionally) transmit Astronomical "telegram" style discovery notices for publication by the Intergalactic Astronomical Union. 
+A simple EDMC plugin to automatically collect codex discovery information for publication by the Intergalactic Astronomical Union. 
 
 (https://github.com/Elite-IGAU/publications/blob/master/IGAU_Codex.csv)
 
