@@ -3,13 +3,6 @@
 # CMDR journal to the Intergalactic Astronomical Union for record keeping,
 # and scientific purposes.
 #
-# CMDR's may also (optionally) submit a public Astronomical Telegram
-# Short "postcard" style anouncements used to immediately (and publicly)
-# announce UNIQUE discoveries.
-#
-# ATEL notices are available at:
-# https://github.com/Elite-IGAU/publications/tree/master/ATEL
-#
 # Data Catalog available at:
 # https://raw.githubusercontent.com/Elite-IGAU/publications/master/IGAU_Codex.csv
 #
@@ -42,11 +35,10 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.33
+this.installed_version = 1.34
 this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
-this.atel = "https://01ixzg9ifh.execute-api.us-west-1.amazonaws.com/Prod"
 PADX = 10  # formatting
 
 def plugin_start3(plugin_dir):
@@ -105,22 +97,6 @@ def upgrade_callback():
 def dashboard_entry(cmdr, is_beta, entry):
     this.cmdr = cmdr
 
-def bulletin_callback():
-    # update the current time, otherwise ATEL notices will all have the same timestamp
-    this.ts = time.time()
-    this.jd = this.ts / 86400 + 2440587.5
-    this.jd_str = str(jd)
-    # Have to make the data string a little different than CODEX_DATA below.
-    ATEL_DATA = '{{ "timestamp":"{}", "Name_Localised":"{}", "System":"{}", "app_name":"{}", "app_version":"{}", "cmdr":"{}", "jd":"{}" }}'.format(this.timestamp, this.name_localised, this.system, this.app_name, this.installed_version, this.cmdr, this.jd_str)
-    ATEL_POST = requests.post(this.atel, data=ATEL_DATA)
-    this.status.set("ATEL "+str(jd)+" Transmitted \n "+this.name_localised)
-
-def forget(widget):
-    widget.grid_forget()
-
-def retrieve(widget):
-    widget.grid(row=10, column=0, columnspan=2, padx=PADX)
-
 def plugin_app(parent):
     this.parent = parent
     this.frame = tk.Frame(parent)
@@ -133,7 +109,6 @@ def plugin_app(parent):
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
     if entry['event'] == 'CodexEntry':
-        # Define variables to be passed along to submit ATEL Function
         this.timestamp=(format(entry['timestamp']))
         this.cmdr = cmdr
         entry['commanderName'] = cmdr
@@ -144,29 +119,21 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.name_localised=(format(entry['Name_Localised']))
         this.system=(format(entry['System']))
         this.systemaddress=(format(entry['SystemAddress']))
-
         try:
             this.voucher=(format(entry['VoucherAmount']))
             CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
             API_POST = requests.post(url = this.api, data = CODEX_DATA)
-            this.status.set("Codex discovery data sent.\n "+this.name_localised)
-            this.b1 = nb.Button(frame, text="[Submit ATEL Report?]", command=bulletin_callback)
-            retrieve(this.b1)
+            this.status.set("Codex data sent!\n "+this.name_localised)
         except KeyError:
             this.status.set("Waiting for Codex data...")
 
     else:
-        # FSDJump happens often enough to clear the status window
         if entry['event'] == 'FSDJump':
                 this.cmdr = cmdr
                 entry['commanderName'] = cmdr
                 this.system=(format(entry['StarSystem']))
                 this.timestamp=(format(entry['timestamp']))
-                this.status.set("Waiting for Codex discovery data...")
-                try:
-                    forget(this.b1)
-                except AttributeError:
-                    this.status.set("Waiting for Codex data...")
+                this.status.set("Waiting for Codex data...")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
