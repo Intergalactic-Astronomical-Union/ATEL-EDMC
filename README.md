@@ -2,9 +2,6 @@ A simple EDMC plugin to automatically collect codex discovery information for pu
 
 (https://github.com/Elite-IGAU/publications/blob/master/IGAU_Codex.csv)
 
-(https://github.com/Elite-IGAU/publications/tree/master/ATEL)
-
-
 
 Installation instructions:
 
