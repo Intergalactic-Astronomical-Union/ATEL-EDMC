@@ -1,20 +1,11 @@
 A simple EDMC plugin to automatically collect codex discovery information for publication by the Intergalactic Astronomical Union. 
 
+**Please Note**
+
+As of November 11th, 2020 this plugin is no longer needed for Codex discovery data. 
+EDSM now provides Codex data dumps at: (https://www.edsm.net/en/nightly-dumps)
+
+Thank you all for supporting the IGAU's EDMC Plugin, and all your data contributions over the past year. 
+
+We will maintain our data dump file at:
 (https://github.com/Elite-IGAU/publications/blob/master/IGAU_Codex.csv)
-
-
-Installation instructions:
-
-- Grab the latest release(s) here (Compatible with EDMC 4.x or **NEWER**):
-
-https://github.com/Elite-IGAU/ATEL-EDMC/releases/tag/latest
-
-- Open EDMC
-
-- Click File -> Settings -> [Plugins]
-
-- Click [Open] next to the Plugins folder listing.
-
-- Download the source zip file, unzip it, then copy the "ATEL" folder to the plugins folder.
-
-- Restart EDMC
