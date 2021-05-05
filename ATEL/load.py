@@ -107,13 +107,13 @@ def plugin_app(parent):
     this.frame.columnconfigure(2, weight=1)
     this.lblstatus = tk.Label(this.frame, anchor=tk.W, textvariable=status, wraplengt=255)
     this.lblstatus.grid(row=0, column=1, sticky=tk.W)
-    this.status.set("Waiting for Event data...")
+    this.status.set("Waiting for data...")
     return this.frame
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
     if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 600:
-        this.status.set("Retriving EDAstro events")
+        this.status.set("Retrieving EDAstro events")
         event_list = ""
         try:
             this.edastro_epoch = int(time.time())
@@ -124,7 +124,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.edastro_dict = dict.fromkeys(event_list,1)
             this.status.set("ATEL: Events retrieved, waiting")
         except KeyError:
-            this.status.set("Waiting for event data...")
+            this.status.set("Waiting for data...")
 
     if edastro_dict[entry['event']] == 1:
         this.status.set("Sending EDAstro data...")
@@ -136,7 +136,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             response = requests.post(url = this.edastro_push, headers = JSON_HEADER, data = EVENT_DATA)
             if (response.status_code == 200):
                 edastro = json.loads(response.text)
-                if (str(edastro['status']) == "200" or str(edastro['status']) == "401"): 
+                if (str(edastro['status']) == "200" or str(edastro['status']) == "401"):
                     # 200 = at least one event accepted, 401 = none were accepted, but no errors either
                     this.status.set("EDAstro data sent! Waiting.")
                 else:
@@ -144,12 +144,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             else:
                 this.status.set('EDAstro POST: "{}"'.format(+response.status_code));
         except KeyError:
-            this.status.set("Waiting for Event data...")
+            this.status.set("Waiting for data...")
 
     if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
-        this.cmdr = cmdr
-        entry['commanderName'] = cmdr
         this.entryid=(format(entry['EntryID']))
         this.name=(format(entry['Name']))
         this.name_stripped=(re.sub(";|\$|_Name", "", this.name))
@@ -165,13 +163,22 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         except KeyError:
             this.status.set("Waiting for data...")
 
-    else:
-        if entry['event'] == 'FSDJump':
-                this.cmdr = cmdr
-                entry['commanderName'] = cmdr
-                this.system=(format(entry['StarSystem']))
-                this.timestamp=(format(entry['timestamp']))
-                this.status.set("Waiting for data...")
+        if entry['event'] == 'ScanOrganic':
+            this.timestamp=(format(entry['timestamp']))
+            this.entryid=(format(entry['Species']))
+            this.name=(format(entry['Genus']))
+            this.name_localised=(format(entry['Genus']))
+            this.system=(format(entry['System']))
+            this.systemaddress=(format(entry['SystemAddress']))
+            SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
+            API_POST = requests.post(url = this.api, data = SCAN_DATA)
+            this.status.set("Scan data sent!\n "+this.name)
+
+        else:
+            if entry['event'] == 'FSDJump':
+                    this.system=(format(entry['StarSystem']))
+                    this.timestamp=(format(entry['timestamp']))
+                    this.status.set("Waiting for data...")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
