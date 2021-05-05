@@ -146,7 +146,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         except KeyError:
             this.status.set("Waiting for data...")
 
-    if entry['event'] == 'CodexEntry':
+ if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['EntryID']))
         this.name=(format(entry['Name']))
@@ -162,12 +162,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.status.set("Codex data sent!\n "+this.name_localised)
         except KeyError:
             this.status.set("Waiting for data...")
-    elif entry['event'] == 'FSDJump':
-                this.system=(format(entry['StarSystem']))
-                this.timestamp=(format(entry['timestamp']))
-                this.status.set("Waiting for data...")
-
-    if entry['event'] == 'ScanOrganic':
+    elif entry['event'] == 'ScanOrganic':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['Species']))
         this.name=(format(entry['Genus']))
