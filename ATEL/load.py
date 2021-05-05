@@ -162,8 +162,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.status.set("Codex data sent!\n "+this.name_localised)
         except KeyError:
             this.status.set("Waiting for data...")
-    else:
-        if entry['event'] == 'FSDJump':
+    elif entry['event'] == 'FSDJump':
                 this.system=(format(entry['StarSystem']))
                 this.timestamp=(format(entry['timestamp']))
                 this.status.set("Waiting for data...")
@@ -178,9 +177,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name)
-
-    else:
-        if entry['event'] == 'FSDJump':
+    elif entry['event'] == 'FSDJump':
                 this.system=(format(entry['StarSystem']))
                 this.timestamp=(format(entry['timestamp']))
                 this.status.set("Waiting for data...")
