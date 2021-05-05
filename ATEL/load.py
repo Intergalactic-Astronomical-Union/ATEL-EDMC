@@ -41,7 +41,7 @@ this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/lat
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 PADX = 10  # formatting
 this.edastro_get = "https://edastro.com/api/accepting"
-this.edastro_push = "http://edastro.com/api/journal"
+this.edastro_push = "https://edastro.com/api/journal"
 this.edastro_epoch = 0
 this.edastro_dict = {}
 
@@ -142,7 +142,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                 else:
                     this.status.set("EDAstro: [{}] {}".format(edastro['status'],edastro['message']))
             else:
-                this.status.set('EDAstro POST: "{}"'.format(+response.status_code));
+                this.status.set('EDAstro POST: "{}"'.format(response.status_code));
         except KeyError:
             this.status.set("Waiting for data...")
 
