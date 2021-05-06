@@ -116,13 +116,14 @@ def edastro_update(cmdr, is_beta, system, station, entry, state):
         this.status.set("Retrieving EDAstro events")
         event_list = ""
         try:
-            this.edastro_epoch = int(time.time())
+            this.edastro_epoch = int(time.time()) - 3000
             response = requests.get(url = this.edastro_get)
             event_json = response.content.strip().decode('utf-8')
             this.status.set("Event list: "+event_json);
             event_list = json.loads(event_json)
             this.edastro_dict = dict.fromkeys(event_list,1)
             this.status.set("Waiting for data...")
+            this.edastro_epoch = int(time.time())
         except KeyError:
             this.status.set("Waiting for data...")
 
