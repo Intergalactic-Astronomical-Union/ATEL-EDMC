@@ -145,6 +145,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
                 this.status.set('EDAstro POST: "{}"'.format(response.status_code));
         except KeyError:
             this.status.set("Waiting for data...")
+    elif entry['event'] == 'FSDJump':
+            this.system=(format(entry['StarSystem']))
+            this.timestamp=(format(entry['timestamp']))
+            this.status.set("Waiting for data...")
 
     if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
