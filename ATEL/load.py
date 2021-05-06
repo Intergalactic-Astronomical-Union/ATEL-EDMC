@@ -122,10 +122,8 @@ def edastro_update(cmdr, is_beta, system, station, entry, state):
             this.status.set("Event list: "+event_json);
             event_list = json.loads(event_json)
             this.edastro_dict = dict.fromkeys(event_list,1)
-            this.status.set("Waiting for data...")
             this.edastro_epoch = int(time.time())
-        except KeyError:
-            this.status.set("Waiting for data...")
+        this.status.set("Waiting for data...")
 
     if edastro_dict[entry['event']] == 1:
         this.status.set("Sending EDAstro data...")
@@ -139,13 +137,12 @@ def edastro_update(cmdr, is_beta, system, station, entry, state):
                 edastro = json.loads(response.text)
                 if (str(edastro['status']) == "200" or str(edastro['status']) == "401"):
                     # 200 = at least one event accepted, 401 = none were accepted, but no errors either
-                    this.status.set("EDAstro data sent! Waiting.")
+                    this.status.set("EDAstro data sent!")
                 else:
                     this.status.set("EDAstro: [{}] {}".format(edastro['status'],edastro['message']))
             else:
                 this.status.set('EDAstro POST: "{}"'.format(response.status_code));
-        except KeyError:
-            this.status.set("Waiting for data...")
+        this.status.set("Waiting for data...")
     elif entry['event'] == 'FSDJump':
             this.system=(format(entry['StarSystem']))
             this.timestamp=(format(entry['timestamp']))
