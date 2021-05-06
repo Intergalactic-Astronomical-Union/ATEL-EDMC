@@ -110,7 +110,7 @@ def plugin_app(parent):
     this.status.set("Waiting for data...")
     return this.frame
 
-def journal_entry(cmdr, is_beta, system, station, entry, state):
+def edastro_update(cmdr, is_beta, system, station, entry, state):
 
     if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 3600:
         this.status.set("Retrieving EDAstro events")
@@ -150,6 +150,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.timestamp=(format(entry['timestamp']))
             this.status.set("Waiting for data...")
 
+def journal_entry(cmdr, is_beta, system, station, entry, state):
+
+    edastro_update(cmdr, is_beta, system, station, entry, state)
+    
     if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['EntryID']))
