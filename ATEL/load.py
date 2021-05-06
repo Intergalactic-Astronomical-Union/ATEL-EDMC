@@ -40,10 +40,6 @@ this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 PADX = 10  # formatting
-this.edastro_get = "https://edastro.com/api/accepting"
-this.edastro_push = "https://edastro.com/api/journal"
-this.edastro_epoch = 0
-this.edastro_dict = {}
 
 def plugin_start3(plugin_dir):
     check_version()
@@ -110,49 +106,8 @@ def plugin_app(parent):
     this.status.set("Waiting for data...")
     return this.frame
 
-def edastro_update(cmdr, is_beta, system, station, entry, state):
-    if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 3600:
-        this.status.set("Retrieving EDAstro events")
-        event_list = ""
-        try:
-            this.edastro_epoch = int(time.time()) - 3000
-            response = requests.get(url = this.edastro_get)
-            event_json = response.content.strip().decode('utf-8')
-            this.status.set("Event list: "+event_json);
-            event_list = json.loads(event_json)
-            this.edastro_dict = dict.fromkeys(event_list,1)
-            this.edastro_epoch = int(time.time())
-            this.status.set("Waiting for data...")
-        except:
-            this.status.set("Waiting for data...")
-
-    if edastro_dict[entry['event']] == 1:
-        this.status.set("Sending EDAstro data...")
-        appHeader = {"appName": this.app_name, "appVersion":this.installed_version}
-        eventEntry = entry.copy()
-        eventObject = [appHeader, eventEntry]
-        EVENT_DATA = json.dumps(eventObject)
-        try:
-            JSON_HEADER = {"Content-Type": "application/json"}
-            response = requests.post(url = this.edastro_push, headers = JSON_HEADER, data = EVENT_DATA)
-            if (response.status_code == 200):
-                edastro = json.loads(response.text)
-                if (str(edastro['status']) == "200" or str(edastro['status']) == "401"):
-                    # 200 = at least one event accepted, 401 = none were accepted, but no errors either
-                    this.status.set("EDAstro data sent!")
-                else:
-                    this.status.set("EDAstro: [{}] {}".format(edastro['status'],edastro['message']))
-            else:
-                this.status.set('EDAstro POST: "{}"'.format(response.status_code));
-        except:
-            this.status.set("Waiting for data...")
-    elif entry['event'] == 'FSDJump':
-            this.system=(format(entry['StarSystem']))
-            this.timestamp=(format(entry['timestamp']))
-            this.status.set("Waiting for data...")
-
 def journal_entry(cmdr, is_beta, system, station, entry, state):
-    edastro_update(cmdr, is_beta, system, station, entry, state)
+
     if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['EntryID']))
