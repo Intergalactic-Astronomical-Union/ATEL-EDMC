@@ -173,9 +173,9 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name)
     elif entry['event'] == 'FSDJump':
-                this.system=(format(entry['StarSystem']))
-                this.timestamp=(format(entry['timestamp']))
-                this.status.set("Waiting for data...")
+        this.system=(format(entry['StarSystem']))
+        this.timestamp=(format(entry['timestamp']))
+        this.status.set("Waiting for data...")
 
 def plugin_stop():
     sys.stderr.write("Shutting down.")
