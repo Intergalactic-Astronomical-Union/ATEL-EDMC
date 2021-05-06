@@ -146,7 +146,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         except KeyError:
             this.status.set("Waiting for data...")
 
- if entry['event'] == 'CodexEntry':
+    if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['EntryID']))
         this.name=(format(entry['Name']))
