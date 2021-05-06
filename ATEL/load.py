@@ -111,7 +111,6 @@ def plugin_app(parent):
     return this.frame
 
 def edastro_update(cmdr, is_beta, system, station, entry, state):
-
     if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 3600:
         this.status.set("Retrieving EDAstro events")
         event_list = ""
@@ -130,7 +129,8 @@ def edastro_update(cmdr, is_beta, system, station, entry, state):
     if edastro_dict[entry['event']] == 1:
         this.status.set("Sending EDAstro data...")
         appHeader = {"appName": this.app_name, "appVersion":this.installed_version}
-        eventObject = [appHeader, entry]
+        eventEntry = entry.copy()
+        eventObject = [appHeader, eventEntry]
         EVENT_DATA = json.dumps(eventObject)
         try:
             JSON_HEADER = {"Content-Type": "application/json"}
@@ -146,16 +146,13 @@ def edastro_update(cmdr, is_beta, system, station, entry, state):
                 this.status.set('EDAstro POST: "{}"'.format(response.status_code));
         except:
             this.status.set("Waiting for data...")
-
-    if entry['event'] == 'FSDJump':
+    elif entry['event'] == 'FSDJump':
             this.system=(format(entry['StarSystem']))
             this.timestamp=(format(entry['timestamp']))
             this.status.set("Waiting for data...")
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
-
     edastro_update(cmdr, is_beta, system, station, entry, state)
-    
     if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['EntryID']))
