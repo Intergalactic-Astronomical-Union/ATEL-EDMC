@@ -125,6 +125,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.status.set("ATEL: Events retrieved, waiting")
         except KeyError:
             this.status.set("Waiting for data...")
+    elif entry['event'] == 'FSDJump':
+            this.system=(format(entry['StarSystem']))
+            this.timestamp=(format(entry['timestamp']))
+            this.status.set("Waiting for data...")
 
     if edastro_dict[entry['event']] == 1:
         this.status.set("Sending EDAstro data...")
