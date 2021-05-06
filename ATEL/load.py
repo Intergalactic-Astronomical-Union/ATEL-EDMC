@@ -112,7 +112,7 @@ def plugin_app(parent):
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
 
-    if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 600:
+    if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 3600:
         this.status.set("Retrieving EDAstro events")
         event_list = ""
         try:
@@ -122,12 +122,8 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
             this.status.set("Event list: "+event_json);
             event_list = json.loads(event_json)
             this.edastro_dict = dict.fromkeys(event_list,1)
-            this.status.set("ATEL: Events retrieved, waiting")
-        except KeyError:
             this.status.set("Waiting for data...")
-    elif entry['event'] == 'FSDJump':
-            this.system=(format(entry['StarSystem']))
-            this.timestamp=(format(entry['timestamp']))
+        except KeyError:
             this.status.set("Waiting for data...")
 
     if edastro_dict[entry['event']] == 1:
