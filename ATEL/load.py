@@ -1,10 +1,13 @@
 ###############################################################################
 # A simple EDMC plugin to automatically transmit CodexEntry data from the
-# CMDR journal to the Intergalactic Astronomical Union for record keeping,
-# and scientific purposes.
+# CMDR journal to the Intergalactic Astronomical Union and EDAstro.com 
+# for record keeping, and scientific purposes.
 #
 # Data Catalog available at:
 # https://raw.githubusercontent.com/Elite-IGAU/publications/master/IGAU_Codex.csv
+#
+# EDAstro Data charts available at:
+# http://edastro.com
 #
 # Please submit bug reports or issues at:
 # https://github.com/Elite-IGAU/ATEL-EDMC/issues
@@ -15,6 +18,8 @@
 #
 # The many wonderful explorers that make the Intergalactic Astronomical Union
 # [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
+#
+# CMDR Orvidius for his amazing data visualizations at EDAstro.com
 #
 ###############################################################################
 
@@ -40,6 +45,11 @@ this.github_latest_version = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-
 this.plugin_source = "https://raw.githubusercontent.com/Elite-IGAU/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
 PADX = 10  # formatting
+this.edastro_get = "https://edastro.com/api/accepting"
+this.edastro_push = "https://edastro.com/api/journal"
+this.edastro_epoch = 0
+this.edastro_dict = {}
+
 
 def plugin_start3(plugin_dir):
     check_version()
@@ -106,8 +116,48 @@ def plugin_app(parent):
     this.status.set("Waiting for data...")
     return this.frame
 
-def journal_entry(cmdr, is_beta, system, station, entry, state):
+def edastro_update(entry):
+    eventname = str(entry['event'])
+    if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 3600:
+        #this.status.set("Retrieving EDAstro events")
+        event_list = ""
+        try:
+            this.edastro_epoch = int(time.time()) - 3000
+            response = requests.get(url = this.edastro_get)
+            event_json = response.content.strip().decode('utf-8')
+            #this.status.set("Event list: "+event_json);
+            event_list = json.loads(event_json)
+            this.edastro_dict = dict.fromkeys(event_list,1)
+            this.edastro_epoch = int(time.time())
+            this.status.set("EDAstro events retrieved")
+        except:
+            this.status.set("EDAstro retrieval fail")
+    if eventname in edastro_dict.keys():
+        #this.status.set("Sending EDAstro data...")
+        appHeader = {"appName": this.app_name, "appVersion":this.installed_version}
+        eventObject = [appHeader, entry]
+        EVENT_DATA = json.dumps(eventObject)
+        try:
+            JSON_HEADER = {"Content-Type": "application/json"}
+            response = requests.post(url = this.edastro_push, headers = JSON_HEADER, data = EVENT_DATA)
+            if (response.status_code == 200):
+                edastro = json.loads(response.text)
+                if (str(edastro['status']) == "200" or str(edastro['status']) == "401"):
+                    # 200 = at least one event accepted, 401 = none were accepted, but no errors either
+                    this.status.set("EDAstro data sent!")
+                else:
+                    this.status.set("EDAstro: [{}] {}".format(edastro['status'],edastro['message']))
+            else:
+                this.status.set('EDAstro POST: "{}"'.format(response.status_code));
+        except:
+            this.status.set("EDAstro push failed")
 
+
+def journal_entry(cmdr, is_beta, system, station, entry, state):
+    try:
+        edastro_update(entry.copy())
+    except:
+        this.status.set("EDAstro exception {}".format(entry['event']))
     if entry['event'] == 'CodexEntry':
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['EntryID']))
@@ -134,7 +184,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name)
-    elif entry['event'] == 'FSDJump':
+    elif entry['event'] == 'FSDJump' or entry['event'] == 'FSSDiscoveryScan':
         this.system=(format(entry['StarSystem']))
         this.timestamp=(format(entry['timestamp']))
         this.status.set("Waiting for data...")
