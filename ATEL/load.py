@@ -134,7 +134,7 @@ def edastro_update(entry):
             this.status.set("EDAstro retrieval fail")
     if eventname in edastro_dict.keys():
         #this.status.set("Sending EDAstro data...")
-        appHeader = {"appName": this.app_name, "appVersion":this.installed_version}
+        appHeader = {"appName": this.app_name, "appVersion":this.installed_version, "odyssey":state.get("Odyssey") }
         eventObject = [appHeader, entry]
         EVENT_DATA = json.dumps(eventObject)
         try:
