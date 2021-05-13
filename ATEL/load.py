@@ -116,7 +116,7 @@ def plugin_app(parent):
     this.status.set("Waiting for data...")
     return this.frame
 
-def edastro_update(system,entry,state):
+def edastro_update(system, entry, state):
     eventname = str(entry['event'])
     if this.edastro_epoch == 0 or int(time.time()) - this.edastro_epoch > 3600:
         #this.status.set("Retrieving EDAstro events")
@@ -134,7 +134,7 @@ def edastro_update(system,entry,state):
             this.status.set("EDAstro retrieval fail")
     if eventname in edastro_dict.keys():
         #this.status.set("Sending EDAstro data...")
-        appHeader = {"appName": this.app_name, "appVersion":this.installed_version, "odyssey":state.get("Odyssey") }
+        appHeader = {"appName": this.app_name, "appVersion":this.installed_version, "odyssey":state.get("Odyssey"), "system":system }
         eventObject = [appHeader, entry]
         EVENT_DATA = json.dumps(eventObject)
         try:
@@ -155,7 +155,7 @@ def edastro_update(system,entry,state):
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
     try:
-        edastro_update(system,entry.copy(),state)
+        edastro_update(system, entry, state)
     except:
         this.status.set("EDAstro exception {}".format(entry['event']))
     if entry['event'] == 'CodexEntry':
