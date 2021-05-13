@@ -1,6 +1,6 @@
 ###############################################################################
 # A simple EDMC plugin to automatically transmit CodexEntry data from the
-# CMDR journal to the Intergalactic Astronomical Union and EDAstro.com 
+# CMDR journal to the Intergalactic Astronomical Union and EDAstro.com
 # for record keeping, and scientific purposes.
 #
 # Data Catalog available at:
@@ -165,11 +165,12 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.name_stripped=(re.sub(";|\$|_Name", "", this.name))
         this.name_lower = str.lower(this.name_stripped)
         this.name_localised=(format(entry['Name_Localised']))
-        this.system=(format(entry['System']))
+        #this.system=(format(entry['System']))
+        this.system=system
         this.systemaddress=(format(entry['SystemAddress']))
         try:
             this.voucher=(format(entry['VoucherAmount']))
-            CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
+            CODEX_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], this.system, entry['SystemAddress'], this.app_name, this.installed_version,)
             API_POST = requests.post(url = this.api, data = CODEX_DATA)
             this.status.set("Codex data sent!\n "+this.name_localised)
         except KeyError:
@@ -179,9 +180,10 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.entryid=(format(entry['Species']))
         this.name=(format(entry['Genus']))
         this.name_localised=(format(entry['Genus']))
-        this.system=(format(entry['System']))
+        #this.system=(format(entry['System']))
+        this.system=system
         this.systemaddress=(format(entry['SystemAddress']))
-        SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], entry['System'], entry['SystemAddress'], this.app_name, this.installed_version,)
+        SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], this.system, entry['SystemAddress'], this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name)
     elif entry['event'] == 'FSDJump' or entry['event'] == 'FSSDiscoveryScan':
