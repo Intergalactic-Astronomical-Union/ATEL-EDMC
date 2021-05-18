@@ -40,7 +40,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.50
+this.installed_version = 1.51
 this.github_latest_version = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -179,11 +179,11 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.timestamp=(format(entry['timestamp']))
         this.entryid=(format(entry['Species']))
         this.name=(format(entry['Genus']))
-        this.name_localised=(format(entry['Genus']))
+        #this.name_localised=(format(entry['Genus']))
         #this.system=(format(entry['System']))
         this.system=system
         this.systemaddress=(format(entry['SystemAddress']))
-        SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name_lower, entry['Name_Localised'], this.system, entry['SystemAddress'], this.app_name, this.installed_version,)
+        SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], entry['EntryID'], this.name, entry['Name_Localised'], this.system, entry['SystemAddress'], this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name)
     elif entry['event'] == 'FSDJump' or entry['event'] == 'FSSDiscoveryScan':
