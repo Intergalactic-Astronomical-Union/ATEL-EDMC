@@ -35,12 +35,17 @@ from tkinter import messagebox
 import myNotebook as nb
 import time
 import re
+import logging
+from config import appname
+# setting up logging
+plugin_name = os.path.basename(os.path.dirname(__file__))
+logger = logging.getLogger(f'{appname}.{plugin_name}')
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.55
+this.installed_version = 1.56
 this.github_latest_version = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -92,7 +97,7 @@ def upgrade_callback():
                 msginfo = ['ATEL-EDMC Upgrade '+this.latest_version_str+' has completed sucessfully.',
                            'Please close and restart EDMC']
                 messagebox.showinfo("Upgrade status", "\n".join(msginfo))
-            sys.stderr.write("Finished ATEL-EDMC upgrade!\n")
+            logger.info("Finished ATEL-EDMC upgrade!\n")
 
         else:
             msginfo = ['ATEL-EDMC Upgrade failed. Bad server response',
@@ -194,4 +199,4 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.status.set("Waiting for data...")
 
 def plugin_stop():
-    sys.stderr.write("Shutting down.")
+    logger.info("Shutting down.")
