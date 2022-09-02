@@ -9,17 +9,8 @@
 # EDAstro Data charts available at:
 # http://edastro.com
 #
-# Please submit bug reports or issues at:
-# https://github.com/Elite-IGAU/ATEL-EDMC/issues
-#
-# Special thanks to:
-#
-# The entire EDCD community for assistance, suggestions, and testing.
-#
-# The many wonderful explorers that make the Intergalactic Astronomical Union
-# [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
-#
-# CMDR Orvidius for his amazing data visualizations at EDAstro.com
+# Please Note: With EDDN and EDSM now carrying Codex data, IGAU will disable this
+# plugin on Dec 31st, 2022
 #
 ###############################################################################
 
@@ -40,7 +31,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.55
+this.installed_version = 1.56
 this.github_latest_version = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
