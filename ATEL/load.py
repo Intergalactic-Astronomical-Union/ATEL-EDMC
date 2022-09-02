@@ -9,17 +9,8 @@
 # EDAstro Data charts available at:
 # http://edastro.com
 #
-# Please submit bug reports or issues at:
-# https://github.com/Elite-IGAU/ATEL-EDMC/issues
-#
-# Special thanks to:
-#
-# The entire EDCD community for assistance, suggestions, and testing.
-#
-# The many wonderful explorers that make the Intergalactic Astronomical Union
-# [IGAU] a productive and enjoyable Elite Dangerous PVE squadron.
-#
-# CMDR Orvidius for his amazing data visualizations at EDAstro.com
+# Please Note: With EDDN and EDSM now carrying Codex data, IGAU will disable this
+# plugin on Dec 31st, 2022
 #
 ###############################################################################
 
