@@ -26,6 +26,11 @@ from tkinter import messagebox
 import myNotebook as nb
 import time
 import re
+import logging
+from config import appname
+# setting up logging
+plugin_name = os.path.basename(os.path.dirname(__file__))
+logger = logging.getLogger(f'{appname}.{plugin_name}')
 
 this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
@@ -83,7 +88,7 @@ def upgrade_callback():
                 msginfo = ['ATEL-EDMC Upgrade '+this.latest_version_str+' has completed sucessfully.',
                            'Please close and restart EDMC']
                 messagebox.showinfo("Upgrade status", "\n".join(msginfo))
-            sys.stderr.write("Finished ATEL-EDMC upgrade!\n")
+            logger.info("Finished ATEL-EDMC upgrade!\n")
 
         else:
             msginfo = ['ATEL-EDMC Upgrade failed. Bad server response',
@@ -185,4 +190,4 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         this.status.set("Waiting for data...")
 
 def plugin_stop():
-    sys.stderr.write("Shutting down.")
+    logger.info("Shutting down.")

@@ -6,4 +6,4 @@ Data is posted at:
 
 (https://edastro.com) (Weekly)
 
-Please note: With EDDN and EDSM now carrying codex data, IGAU will disable this plugin December 31st, 2022. 
+Please note: With EDDN and EDSM now carrying Codex data, IGAU will disable this plugin December 31st, 2022.
