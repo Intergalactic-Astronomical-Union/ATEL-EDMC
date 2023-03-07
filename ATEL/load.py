@@ -184,9 +184,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], this.entryid, this.name_lower, this.name_localised, this.system, this.systemaddress, this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name_localised)
-    elif entry['event'] == 'FSDJump' or entry['event'] == 'FSSDiscoveryScan':
+    elif entry['event'] == 'FSDJump':
         this.system=(format(entry['StarSystem']))
         this.timestamp=(format(entry['timestamp']))
+        this.status.set("Waiting for data...")
+    elif entry['event'] == 'FSSDiscoveryScan':
+        this.system = (format(entry['SystemName']))
+        this.timestamp = (format(entry['timestamp']))
         this.status.set("Waiting for data...")
 
 def plugin_stop():
