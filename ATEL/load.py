@@ -36,7 +36,7 @@ this = sys.modules[__name__]	# For holding module globals
 this.status = tk.StringVar()
 this.edsm_setting = None
 this.app_name = 'ATEL-EDMC'
-this.installed_version = 1.56
+this.installed_version = 1.57
 this.github_latest_version = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/version.txt"
 this.plugin_source = "https://raw.githubusercontent.com/Intergalactic-Astronomical-Union/ATEL-EDMC/latest/ATEL/load.py"
 this.api = "https://ddss70885k.execute-api.us-west-1.amazonaws.com/Prod"
@@ -184,9 +184,13 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
         SCAN_DATA = '{{ "timestamp":"{}", "EntryID":"{}", "Name":"{}", "Name_Localised":"{}", "System":"{}", "SystemAddress":"{}", "App_Name":"{}", "App_Version":"{}"}}'.format(entry['timestamp'], this.entryid, this.name_lower, this.name_localised, this.system, this.systemaddress, this.app_name, this.installed_version,)
         API_POST = requests.post(url = this.api, data = SCAN_DATA)
         this.status.set("Scan data sent!\n "+this.name_localised)
-    elif entry['event'] == 'FSDJump' or entry['event'] == 'FSSDiscoveryScan':
+    elif entry['event'] == 'FSDJump':
         this.system=(format(entry['StarSystem']))
         this.timestamp=(format(entry['timestamp']))
+        this.status.set("Waiting for data...")
+    elif entry['event'] == 'FSSDiscoveryScan':
+        this.system = (format(entry['SystemName']))
+        this.timestamp = (format(entry['timestamp']))
         this.status.set("Waiting for data...")
 
 def plugin_stop():
