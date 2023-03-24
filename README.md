@@ -2,6 +2,6 @@ A simple EDMC plugin to automatically collect discovery data for publication by 
 
 Data is posted at: 
 
-(https://github.com/Elite-IGAU/publications/blob/master/IGAU_Codex.csv) (Monthly)
+(https://github.com/Elite-IGAU/publications) (Monthly)
 
 (https://edastro.com) (Weekly)
