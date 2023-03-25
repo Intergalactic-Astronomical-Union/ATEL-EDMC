@@ -59,9 +59,9 @@ def plugin_prefs(parent, cmdr, is_beta):
     this.latest_version_str = str(this.latest_version)
     nb.Label(frame, text="ATEL-EDMC {INSTALLED}".format(INSTALLED=installed_version)).grid(columnspan=2, padx=PADX, sticky=tk.W)
     nb.Label(frame, text="Latest ATEL-EDMC version: {latest_version_str}".format(latest_version_str=latest_version_str)).grid(columnspan=2, padx=PADX, sticky=tk.W)
-    HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Elite-IGAU/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='GitHub', background=nb.Label().cget('background'), url='https://github.com/Intergalactic-Astronomical-Union/ATEL-EDMC\n', underline=True).grid(padx=PADX, sticky=tk.W)
     HyperlinkLabel(frame, text='Discord', background=nb.Label().cget('background'), url='https://discord.gg/2Qq37xt\n', underline=True).grid(padx=PADX, sticky=tk.W)
-    HyperlinkLabel(frame, text='Web', background=nb.Label().cget('background'), url='https://elite-igau.github.io/\n', underline=True).grid(padx=PADX, sticky=tk.W)
+    HyperlinkLabel(frame, text='Web', background=nb.Label().cget('background'), url='https://intergalactic-astronomical-union.github.io\n', underline=True).grid(padx=PADX, sticky=tk.W)
     return frame
 
 def check_version():
