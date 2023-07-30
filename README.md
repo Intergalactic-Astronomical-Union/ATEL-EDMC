@@ -1,7 +1,7 @@
-A simple EDMC plugin to automatically collect discovery data for publication by the Intergalactic Astronomical Union and EDAstro.com
+A simple EDMC plugin to automatically collect codex discovery data for publication by the Intergalactic Astronomical Union and EDAstro.com
 
 Data is posted at: 
 
-(https://github.com/Elite-IGAU/publications) (Monthly)
+(https://github.com/Intergalactic-Astronomical-Union/publications/blob/master/IGAU_Codex.csv.gz) (Monthly)
 
-(https://edastro.com) (Weekly)
+(https://edastro.com/mapcharts/codex.html) (Weekly)
